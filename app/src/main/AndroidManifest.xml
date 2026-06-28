@@ -11,6 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Parcial1amacn4adotsenko">
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".FriendsActivity" />
+        <activity android:name=".CalendarActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

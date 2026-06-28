@@ -16,5 +16,14 @@
     <string name="completed_today_preview">0 rachas completadas hoy</string>
     <string name="home_subtitle">¡Sigue construyendo tu mejor versión!</string>
     <string name="today_motivation">¡Increíble! Sigue así</string>
+    <string name="title_calendar">Calendario</string>
+    <string name="subtitle_calendar">Pantalla en construcción. Acá vamos a agregar el seguimiento de rachas por día.</string>
+
+    <string name="title_friends">Amigos</string>
+    <string name="subtitle_friends">Pantalla en construcción. Acá vamos a agregar rachas compartidas y actividad de amigos.</string>
+
+    <string name="title_profile">Perfil</string>
+    <string name="subtitle_profile">Pantalla en construcción. Acá vamos a agregar datos del usuario y estadísticas personales.</string>
+
 
 </resources>
