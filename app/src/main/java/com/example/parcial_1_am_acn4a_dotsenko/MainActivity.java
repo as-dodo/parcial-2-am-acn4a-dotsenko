@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import android.content.Intent;
+import android.app.AlertDialog;
+import android.text.TextUtils;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,11 +46,66 @@ public class MainActivity extends AppCompatActivity {
         agregarRacha("🏃", "Correr", 10, false);
         agregarRacha("🚭", "No fumar", 60, true);
 
-        btnNuevaRacha.setOnClickListener(v -> {
-            agregarRacha("⭐", "Nueva racha", 0, false);
-        });
+        btnNuevaRacha.setOnClickListener(v -> mostrarDialogNuevaRacha());
         BottomNavigationHelper.setup(this, R.id.menuInicio);
 
+    }
+
+    private void mostrarDialogNuevaRacha() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_racha, null);
+
+        EditText inputNombre = dialogView.findViewById(R.id.inputRachaNombre);
+        EditText inputIcono = dialogView.findViewById(R.id.inputRachaIcono);
+        EditText inputDias = dialogView.findViewById(R.id.inputRachaDias);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_new_racha_title)
+                .setView(dialogView)
+                .setPositiveButton(R.string.dialog_new_racha_add, null)
+                .setNegativeButton(R.string.dialog_new_racha_cancel, null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String nombre = inputNombre.getText().toString().trim();
+                String icono = inputIcono.getText().toString().trim();
+                String diasText = inputDias.getText().toString().trim();
+
+                if (TextUtils.isEmpty(nombre)) {
+                    inputNombre.setError(getString(R.string.dialog_new_racha_name_required));
+                    return;
+                }
+
+                int dias = 0;
+
+                if (!TextUtils.isEmpty(diasText)) {
+                    try {
+                        dias = Integer.parseInt(diasText);
+                    } catch (NumberFormatException ex) {
+                        inputDias.setError(getString(R.string.dialog_new_racha_invalid_days));
+                        return;
+                    }
+                }
+
+                if (dias < 0) {
+                    inputDias.setError(getString(R.string.dialog_new_racha_invalid_days));
+                    return;
+                }
+
+                if (TextUtils.isEmpty(icono)) {
+                    icono = getString(R.string.default_racha_icon);
+                }
+
+                agregarRacha(icono, nombre, dias, false);
+                mostrarRachas();
+                actualizarResumenDelDia();
+
+                Toast.makeText(this, R.string.dialog_new_racha_added, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
     }
 
     private void agregarRacha(String icono, String nombre, int dias, boolean completadaHoy) {
@@ -61,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
         mostrarRachas();
     }
-
 
     private void mostrarRachas() {
         rachaContainer.removeAllViews();

@@ -28,12 +28,20 @@
     <string name="default_racha_icon">⭐</string>
     <string name="title_calendar">Calendario</string>
     <string name="subtitle_calendar">Pantalla en construcción. Acá vamos a agregar el seguimiento de rachas por día.</string>
-
     <string name="title_friends">Amigos</string>
     <string name="subtitle_friends">Pantalla en construcción. Acá vamos a agregar rachas compartidas y actividad de amigos.</string>
-
     <string name="title_profile">Perfil</string>
     <string name="subtitle_profile">Pantalla en construcción. Acá vamos a agregar datos del usuario y estadísticas personales.</string>
+    <string name="dialog_new_racha_title">Nueva racha</string>
+    <string name="dialog_new_racha_description">Completá los datos para agregar una nueva racha a tu lista.</string>
+    <string name="dialog_new_racha_name_hint">Nombre de la racha</string>
+    <string name="dialog_new_racha_icon_hint">Icono o emoji</string>
+    <string name="dialog_new_racha_days_hint">Días acumulados</string>
+    <string name="dialog_new_racha_add">Agregar</string>
+    <string name="dialog_new_racha_cancel">Cancelar</string>
+    <string name="dialog_new_racha_name_required">Ingresá el nombre de la racha.</string>
+    <string name="dialog_new_racha_invalid_days">Los días deben ser un número válido.</string>
+    <string name="dialog_new_racha_added">Racha agregada.</string>
 
 
 </resources>
