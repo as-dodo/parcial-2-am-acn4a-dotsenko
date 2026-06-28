@@ -9,6 +9,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -100,6 +101,15 @@ public class MainActivity extends AppCompatActivity {
 
                 txtDays.setText(getString(R.string.racha_days_format, racha.dias));
                 actualizarResumenDelDia();
+            });
+
+            card.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, RachaDetailActivity.class);
+                intent.putExtra(RachaDetailActivity.EXTRA_NOMBRE, racha.nombre);
+                intent.putExtra(RachaDetailActivity.EXTRA_ICONO, racha.icono);
+                intent.putExtra(RachaDetailActivity.EXTRA_DIAS, racha.dias);
+                intent.putExtra(RachaDetailActivity.EXTRA_COMPLETADA_HOY, racha.completadaHoy);
+                startActivity(intent);
             });
 
             rachaContainer.addView(card);

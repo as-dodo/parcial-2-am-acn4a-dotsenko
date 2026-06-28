@@ -16,6 +16,16 @@
     <string name="completed_today_preview">0 rachas completadas hoy</string>
     <string name="home_subtitle">¡Sigue construyendo tu mejor versión!</string>
     <string name="today_motivation">¡Increíble! Sigue así</string>
+    <string name="detail_title">Detalle de racha</string>
+    <string name="detail_back">Volver</string>
+    <string name="detail_unknown_racha">Racha</string>
+    <string name="detail_days_format">%1$d días acumulados</string>
+    <string name="detail_completed_today">Completada hoy</string>
+    <string name="detail_pending_today">Pendiente para hoy</string>
+    <string name="detail_status_format">Estado: %1$s</string>
+    <string name="detail_description_completed">Muy bien. Esta racha ya fue completada hoy. Seguí manteniendo el hábito para no cortar tu progreso.</string>
+    <string name="detail_description_pending">Todavía falta completar esta racha hoy. Podés volver al inicio y marcarla cuando termines la actividad.</string>
+    <string name="default_racha_icon">⭐</string>
     <string name="title_calendar">Calendario</string>
     <string name="subtitle_calendar">Pantalla en construcción. Acá vamos a agregar el seguimiento de rachas por día.</string>
 
