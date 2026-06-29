@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Racha App</string>
-    <string name="title_home">Hola, Ana</string>
+    <string name="title_home">Hola</string>
+    <string name="greeting_default">Hola</string>
+    <string name="greeting_user_format">Hola, %1$s</string>
     <string name="today_format">Hoy, %1$s</string>
     <string name="avatar_ana">Avatar de Ana</string>
     <string name="btn_new_racha">Nueva racha</string>

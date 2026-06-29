@@ -21,12 +21,29 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout rachaContainer;
     private TextView txtCompletedToday;
+    private TextView txtGreeting;
     private ArrayList<Racha> rachas = new ArrayList<>();
+    private com.google.firebase.auth.FirebaseAuth auth;
+    private com.google.firebase.firestore.FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+        db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+
+        com.google.firebase.auth.FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        txtGreeting = findViewById(R.id.txtTitle);
+        // load profile (one-time read)
+        cargarPerfilUsuario(currentUser.getUid());
+
         TextView txtToday = findViewById(R.id.txtToday);
 
         java.text.SimpleDateFormat sdf =
@@ -49,6 +66,30 @@ public class MainActivity extends AppCompatActivity {
         btnNuevaRacha.setOnClickListener(v -> mostrarDialogNuevaRacha());
         BottomNavigationHelper.setup(this, R.id.menuInicio);
 
+    }
+    private void cargarPerfilUsuario(String userId) {
+        db.collection("users")
+                .whereEqualTo("userId", userId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        txtGreeting.setText(getString(R.string.greeting_default));
+                        return;
+                    }
+                    String fullName = queryDocumentSnapshots
+                            .getDocuments()
+                            .get(0)
+                            .getString("fullName");
+                    if (fullName == null || fullName.trim().isEmpty()) {
+                        txtGreeting.setText(getString(R.string.greeting_default));
+                    } else {
+                        txtGreeting.setText(getString(R.string.greeting_user_format, fullName));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    txtGreeting.setText(getString(R.string.greeting_default));
+                });
     }
 
     private void mostrarDialogNuevaRacha() {
