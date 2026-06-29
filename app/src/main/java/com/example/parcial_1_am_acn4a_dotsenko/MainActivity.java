@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         txtGreeting = findViewById(R.id.txtTitle);
-        // load profile (one-time read)
         cargarPerfilUsuario(currentUser.getUid());
 
         TextView txtToday = findViewById(R.id.txtToday);

@@ -1,23 +1,92 @@
 package com.example.parcial_1_am_acn4a_dotsenko;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class ProfileActivity extends AppCompatActivity {
+
+    private TextView txtUserEmail;
+    private TextView txtUserName;
+
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_placeholder_page);
+        setContentView(R.layout.activity_profile);
 
-        TextView txtPageTitle = findViewById(R.id.txtPageTitle);
-        TextView txtPageSubtitle = findViewById(R.id.txtPageSubtitle);
+        txtUserEmail = findViewById(R.id.txtUserEmail);
+        txtUserName = findViewById(R.id.txtUserName);
+        Button btnLogout = findViewById(R.id.btnLogout);
 
-        txtPageTitle.setText(R.string.title_profile);
-        txtPageSubtitle.setText(R.string.subtitle_profile);
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser == null) {
+            txtUserName.setText("Usuario");
+            txtUserEmail.setVisibility(View.GONE);
+        } else {
+            String email = currentUser.getEmail();
+
+            txtUserEmail.setText(email != null ? email : "");
+            txtUserEmail.setVisibility(email != null && !email.isEmpty() ? View.VISIBLE : View.GONE);
+
+            cargarPerfilUsuario(currentUser.getUid(), email);
+        }
+
+        btnLogout.setOnClickListener(v -> {
+            auth.signOut();
+
+            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
 
         BottomNavigationHelper.setup(this, R.id.menuPerfil);
+    }
+
+    private void cargarPerfilUsuario(String userId, String email) {
+        db.collection("users")
+                .whereEqualTo("userId", userId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        mostrarFallbackUsuario(email);
+                        return;
+                    }
+
+                    String fullName = queryDocumentSnapshots
+                            .getDocuments()
+                            .get(0)
+                            .getString("fullName");
+
+                    if (fullName == null || fullName.trim().isEmpty()) {
+                        mostrarFallbackUsuario(email);
+                    } else {
+                        txtUserName.setText(fullName);
+                    }
+                })
+                .addOnFailureListener(e -> mostrarFallbackUsuario(email));
+    }
+
+    private void mostrarFallbackUsuario(String email) {
+        if (email != null && !email.isEmpty()) {
+            txtUserName.setText(email);
+        } else {
+            txtUserName.setText("Usuario");
+        }
     }
 }

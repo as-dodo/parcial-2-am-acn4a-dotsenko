@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -40,34 +42,61 @@ public class RegisterActivity extends AppCompatActivity {
             String email = inputEmail.getText().toString().trim();
             String password = inputPassword.getText().toString().trim();
 
-            if (TextUtils.isEmpty(fullName) || TextUtils.isEmpty(phoneNumber)
-                    || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            if (TextUtils.isEmpty(fullName)
+                    || TextUtils.isEmpty(phoneNumber)
+                    || TextUtils.isEmpty(email)
+                    || TextUtils.isEmpty(password)) {
                 Toast.makeText(this, R.string.register_error_fill_fields, Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            btnCreateAccount.setEnabled(false);
+
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            String userId = auth.getCurrentUser().getUid();
-                            Map<String, Object> userData = new HashMap<>();
-                            userData.put("userId", userId);
-                            userData.put("fullName", fullName);
-                            userData.put("phoneNumber", phoneNumber);
-                            userData.put("email", email);
-
-                            db.collection("users")
-                                    .add(userData)
-                                    .addOnSuccessListener(documentReference -> {
-                                        startActivity(new Intent(RegisterActivity.this, MainActivity.class));
-                                        finish();
-                                    })
-                                    .addOnFailureListener(e -> Toast.makeText(this,
-                                            R.string.register_error_save_profile,
-                                            Toast.LENGTH_SHORT).show());
-                        } else {
+                        if (!task.isSuccessful()) {
+                            btnCreateAccount.setEnabled(true);
                             Toast.makeText(this, R.string.register_error_create_account, Toast.LENGTH_SHORT).show();
+                            return;
                         }
+
+                        FirebaseUser currentUser = auth.getCurrentUser();
+
+                        if (currentUser == null) {
+                            btnCreateAccount.setEnabled(true);
+                            Toast.makeText(this, R.string.register_error_create_account, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String userId = currentUser.getUid();
+
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("userId", userId);
+                        userData.put("fullName", fullName);
+                        userData.put("phoneNumber", phoneNumber);
+                        userData.put("email", email);
+
+                        UserProfileChangeRequest profileUpdates =
+                                new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(fullName)
+                                        .build();
+
+                        currentUser.updateProfile(profileUpdates);
+
+                        db.collection("users")
+                                .document(userId)
+                                .set(userData)
+                                .addOnSuccessListener(unused -> {
+                                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                })
+                                .addOnFailureListener(e -> {
+                                    btnCreateAccount.setEnabled(true);
+                                    Toast.makeText(this,
+                                            R.string.register_error_save_profile,
+                                            Toast.LENGTH_SHORT).show();
+                                });
                     });
         });
     }
