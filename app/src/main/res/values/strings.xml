@@ -42,6 +42,17 @@
     <string name="dialog_new_racha_name_required">Ingresá el nombre de la racha.</string>
     <string name="dialog_new_racha_invalid_days">Los días deben ser un número válido.</string>
     <string name="dialog_new_racha_added">Racha agregada.</string>
-
-
+    <string name="login_error_fill_fields">Por favor ingresa email y contraseña.</string>
+    <string name="login_error_failed">No se pudo iniciar sesión.</string>
+    <string name="register_error_fill_fields">Por favor completa todos los campos.</string>
+    <string name="register_error_save_profile">No se pudo guardar el perfil.</string>
+    <string name="register_error_create_account">No se pudo crear la cuenta.</string>
+    <string name="login_title">LoginActivity</string>
+    <string name="register_title">RegisterActivity</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_full_name">Full Name</string>
+    <string name="hint_phone_number">Phone Number</string>
+    <string name="button_login">Iniciar sesión</string>
+    <string name="button_create_account">Crear cuenta</string>
 </resources>
