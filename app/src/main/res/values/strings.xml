@@ -38,6 +38,18 @@
     <string name="subtitle_friends">Pantalla en construcción. Acá vamos a agregar rachas compartidas y actividad de amigos.</string>
     <string name="title_profile">Perfil</string>
     <string name="subtitle_profile">Pantalla en construcción. Acá vamos a agregar datos del usuario y estadísticas personales.</string>
+    <string name="profile_photo_desc">Foto de perfil</string>
+    <string name="btn_logout">Cerrar sesión</string>
+    <string name="profile_active_rachas_label">Rachas activas</string>
+    <string name="profile_completed_today_label">Completadas hoy</string>
+    <string name="profile_best_streak_label">Mejor racha</string>
+    <string name="profile_best_streak_value">%1$s — %2$d días</string>
+
+    <!-- Estadísticas de Perfil -->
+    <string name="profile_active_rachas">%1$d rachas activas</string>
+    <string name="profile_completed_today">%1$d completadas hoy</string>
+    <string name="profile_best_streak">%1$s — %2$d días</string>
+
     <string name="dialog_new_racha_title">Nueva racha</string>
     <string name="dialog_new_racha_description">Completá los datos para agregar una nueva racha a tu lista.</string>
     <string name="dialog_new_racha_name_hint">Nombre de la racha</string>
@@ -53,8 +65,8 @@
     <string name="register_error_fill_fields">Por favor completa todos los campos.</string>
     <string name="register_error_save_profile">No se pudo guardar el perfil.</string>
     <string name="register_error_create_account">No se pudo crear la cuenta.</string>
-    <string name="login_title">LoginActivity</string>
-    <string name="register_title">RegisterActivity</string>
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="register_title">Crear cuenta</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="hint_full_name">Full Name</string>

@@ -12,5 +12,7 @@
     <dimen name="menu_text_size">13sp</dimen>
     <dimen name="spacing_small">8dp</dimen>
     <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="stat_icon_container">52dp</dimen>
+    <dimen name="stat_icon_size">24dp</dimen>
 
 </resources>

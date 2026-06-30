@@ -16,6 +16,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     private TextView txtUserEmail;
     private TextView txtUserName;
+    private TextView txtActiveRachas;
+    private TextView txtCompletedToday;
+    private TextView txtBestRacha;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -27,6 +30,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         txtUserEmail = findViewById(R.id.txtUserEmail);
         txtUserName = findViewById(R.id.txtUserName);
+        txtActiveRachas = findViewById(R.id.txtActiveRachas);
+        txtCompletedToday = findViewById(R.id.txtCompletedToday);
+        txtBestRacha = findViewById(R.id.txtBestRacha);
         Button btnLogout = findViewById(R.id.btnLogout);
 
         auth = FirebaseAuth.getInstance();
@@ -54,7 +60,19 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        mostrarEstadisticasMock();
         BottomNavigationHelper.setup(this, R.id.menuPerfil);
+    }
+
+    private void mostrarEstadisticasMock() {
+        int activeRachas = 5;
+        int completedToday = 3;
+        String bestRachaName = "No fumar";
+        int bestRachaDays = 60;
+
+        txtActiveRachas.setText(getString(R.string.profile_active_rachas, activeRachas));
+        txtCompletedToday.setText(getString(R.string.profile_completed_today, completedToday));
+        txtBestRacha.setText(getString(R.string.profile_best_streak, bestRachaName, bestRachaDays));
     }
 
     private void cargarPerfilUsuario(String userId, String email) {
