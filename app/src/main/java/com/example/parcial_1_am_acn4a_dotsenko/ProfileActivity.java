@@ -59,19 +59,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void cargarPerfilUsuario(String userId, String email) {
         db.collection("users")
-                .whereEqualTo("userId", userId)
-                .limit(1)
+                .document(userId)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.isEmpty()) {
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
                         mostrarFallbackUsuario(email);
                         return;
                     }
 
-                    String fullName = queryDocumentSnapshots
-                            .getDocuments()
-                            .get(0)
-                            .getString("fullName");
+                    String fullName = documentSnapshot.getString("fullName");
 
                     if (fullName == null || fullName.trim().isEmpty()) {
                         mostrarFallbackUsuario(email);
