@@ -14,6 +14,10 @@
     <string name="racha_days_format">%1$d días</string>
     <string name="fire_icon">Estado de racha completada</string>
     <string name="friend_rachas">Rachas con amigos</string>
+    <string name="search_friends_hint">Buscar amigos</string>
+    <string name="shared_rachas_title">Rachas compartidas</string>
+    <string name="view_all">Ver todas</string>
+    <string name="your_friends">Tus amigos</string>
     <string name="completed_today_format">%1$d rachas completadas hoy</string>
     <string name="completed_today_preview">0 rachas completadas hoy</string>
     <string name="home_subtitle">¡Sigue construyendo tu mejor versión!</string>

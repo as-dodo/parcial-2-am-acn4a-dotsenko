@@ -5,4 +5,8 @@
     <color name="gray_dark">#666666</color>
     <color name="gray_light">#999999</color>
     <color name="purple_main">#6F55B5</color>
+    <color name="pink">#D0519B</color>
+    <color name="green">#3AA55B</color>
+    <color name="orange">#F29833</color>
+    <color name="blue">#3D6AF0</color>
 </resources>
