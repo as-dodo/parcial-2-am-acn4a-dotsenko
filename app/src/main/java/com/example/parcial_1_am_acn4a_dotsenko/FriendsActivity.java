@@ -29,14 +29,14 @@ public class FriendsActivity extends AppCompatActivity {
 
     private static final String COLLECTION_USERS = "users";
     private static final String COLLECTION_FRIENDS = "friends";
-    private static final String COLLECTION_RACHAS = "rachas";
     private static final String FIELD_FULL_NAME = "fullName";
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_PHOTO_URL = "photoUrl";
-    private static final String FIELD_NOMBRE = "nombre";
     private static final String FIELD_NOMBRE_KEY = "nombreKey";
-    private static final String FIELD_ICONO = "icono";
-    private static final String FIELD_DIAS = "dias";
+    private static final String FIELD_MATCHED_RACHA_NAME = "matchedRachaName";
+    private static final String FIELD_MATCHED_RACHA_ICON = "matchedRachaIcon";
+    private static final String FIELD_MATCHED_RACHA_DAYS = "matchedRachaDays";
+    private static final String FIELD_SELECTED_RACHAS = "selectedRachas";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout friendsContainer;
@@ -67,20 +67,6 @@ public class FriendsActivity extends AppCompatActivity {
 
         db.collection(COLLECTION_USERS)
                 .document(userId)
-                .collection(COLLECTION_RACHAS)
-                .get()
-                .addOnSuccessListener(myRachaSnapshots ->
-                        cargarDocumentosDeAmigos(userId, getRachasByKey(myRachaSnapshots.getDocuments())))
-                .addOnFailureListener(e -> {
-                    friendsContainer.removeAllViews();
-                    addInfoRow(getString(R.string.friends_load_error));
-                    Toast.makeText(this, R.string.friends_load_error, Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void cargarDocumentosDeAmigos(String userId, Map<String, SharedRacha> myRachasByKey) {
-        db.collection(COLLECTION_USERS)
-                .document(userId)
                 .collection(COLLECTION_FRIENDS)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -92,7 +78,7 @@ public class FriendsActivity extends AppCompatActivity {
                     }
 
                     for (DocumentSnapshot friendDocument : queryDocumentSnapshots.getDocuments()) {
-                        addFriendRow(friendDocument, myRachasByKey);
+                        addFriendRow(friendDocument);
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -100,34 +86,6 @@ public class FriendsActivity extends AppCompatActivity {
                     addInfoRow(getString(R.string.friends_load_error));
                     Toast.makeText(this, R.string.friends_load_error, Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    private Map<String, SharedRacha> getRachasByKey(Iterable<DocumentSnapshot> rachaDocuments) {
-        Map<String, SharedRacha> rachasByKey = new HashMap<>();
-
-        for (DocumentSnapshot rachaDocument : rachaDocuments) {
-            String nombre = rachaDocument.getString(FIELD_NOMBRE);
-            String nombreKey = rachaDocument.getString(FIELD_NOMBRE_KEY);
-            String icono = rachaDocument.getString(FIELD_ICONO);
-
-            if (nombre == null || nombre.trim().isEmpty()) {
-                nombre = getString(R.string.detail_unknown_racha);
-            }
-
-            if (nombreKey == null || nombreKey.trim().isEmpty()) {
-                nombreKey = normalizeNombreKey(nombre);
-            }
-
-            if (icono == null || icono.trim().isEmpty()) {
-                icono = getString(R.string.default_racha_icon);
-            }
-
-            if (!nombreKey.trim().isEmpty()) {
-                rachasByKey.put(nombreKey, new SharedRacha(nombre, icono));
-            }
-        }
-
-        return rachasByKey;
     }
 
     private void addInfoRow(String text) {
@@ -144,10 +102,11 @@ public class FriendsActivity extends AppCompatActivity {
         friendsContainer.addView(textView);
     }
 
-    private void addFriendRow(DocumentSnapshot friendDocument, Map<String, SharedRacha> myRachasByKey) {
+    private void addFriendRow(DocumentSnapshot friendDocument) {
         String fullName = friendDocument.getString(FIELD_FULL_NAME);
         String email = friendDocument.getString(FIELD_EMAIL);
         String photoUrl = friendDocument.getString(FIELD_PHOTO_URL);
+        Map<String, SharedRacha> selectedRachas = getSelectedRachas(friendDocument);
 
         if (fullName == null || fullName.trim().isEmpty()) {
             fullName = getString(R.string.detail_unknown_user);
@@ -220,54 +179,15 @@ public class FriendsActivity extends AppCompatActivity {
         commonContainer.setOrientation(LinearLayout.VERTICAL);
         card.addView(commonContainer);
 
-        addCommonLoadingRow(commonContainer);
+        if (selectedRachas.isEmpty()) {
+            addCommonInfoRow(commonContainer, getString(R.string.friends_common_rachas_empty));
+        } else {
+            for (SharedRacha racha : selectedRachas.values()) {
+                addCommonRachaRow(commonContainer, racha.nombre, racha.icono, racha.days);
+            }
+        }
+
         friendsContainer.addView(card);
-
-        db.collection(COLLECTION_USERS)
-                .document(friendDocument.getId())
-                .collection(COLLECTION_RACHAS)
-                .get()
-                .addOnSuccessListener(friendRachaSnapshots -> {
-                    commonContainer.removeAllViews();
-                    int matches = 0;
-
-                    for (DocumentSnapshot rachaDocument : friendRachaSnapshots.getDocuments()) {
-                        String nombre = rachaDocument.getString(FIELD_NOMBRE);
-                        String nombreKey = rachaDocument.getString(FIELD_NOMBRE_KEY);
-
-                        if (nombreKey == null || nombreKey.trim().isEmpty()) {
-                            nombreKey = normalizeNombreKey(nombre);
-                        }
-
-                        SharedRacha myRacha = myRachasByKey.get(nombreKey);
-                        if (myRacha == null) {
-                            continue;
-                        }
-
-                        String icono = rachaDocument.getString(FIELD_ICONO);
-                        Long daysValue = rachaDocument.getLong(FIELD_DIAS);
-                        int days = daysValue != null ? daysValue.intValue() : 0;
-
-                        if (icono == null || icono.trim().isEmpty()) {
-                            icono = myRacha.icono;
-                        }
-
-                        addCommonRachaRow(commonContainer, myRacha.nombre, icono, days);
-                        matches++;
-                    }
-
-                    if (matches == 0) {
-                        addCommonInfoRow(commonContainer, getString(R.string.friends_common_rachas_empty));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    commonContainer.removeAllViews();
-                    addCommonInfoRow(commonContainer, getString(R.string.friends_common_rachas_error));
-                });
-    }
-
-    private void addCommonLoadingRow(LinearLayout container) {
-        addCommonInfoRow(container, getString(R.string.friends_common_rachas_loading));
     }
 
     private void addCommonInfoRow(LinearLayout container, String text) {
@@ -303,6 +223,94 @@ public class FriendsActivity extends AppCompatActivity {
         row.addView(txtDays);
 
         container.addView(row);
+    }
+
+    private Map<String, SharedRacha> getSelectedRachas(DocumentSnapshot friendDocument) {
+        Map<String, SharedRacha> selectedRachas = new HashMap<>();
+        Object selectedRachasValue = friendDocument.get(FIELD_SELECTED_RACHAS);
+
+        if (selectedRachasValue instanceof Map) {
+            Map<?, ?> selectedRachasMap = (Map<?, ?>) selectedRachasValue;
+
+            for (Map.Entry<?, ?> entry : selectedRachasMap.entrySet()) {
+                if (!(entry.getValue() instanceof Map)) {
+                    continue;
+                }
+
+                SharedRacha racha = getSharedRachaFromMap((Map<?, ?>) entry.getValue());
+                String nombreKey = getStringValue(entry.getKey());
+                if (nombreKey.trim().isEmpty()) {
+                    nombreKey = getStringValue(((Map<?, ?>) entry.getValue()).get(FIELD_NOMBRE_KEY));
+                }
+                if (nombreKey.trim().isEmpty()) {
+                    nombreKey = normalizeNombreKey(racha.nombre);
+                }
+
+                if (!nombreKey.trim().isEmpty()) {
+                    selectedRachas.put(nombreKey, racha);
+                }
+            }
+        }
+
+        if (selectedRachas.isEmpty()) {
+            SharedRacha legacyRacha = getLegacySharedRacha(friendDocument);
+            if (legacyRacha != null) {
+                String legacyKey = normalizeNombreKey(legacyRacha.nombre);
+                if (!legacyKey.trim().isEmpty()) {
+                    selectedRachas.put(legacyKey, legacyRacha);
+                }
+            }
+        }
+
+        return selectedRachas;
+    }
+
+    private SharedRacha getSharedRachaFromMap(Map<?, ?> rachaData) {
+        String nombre = getStringValue(rachaData.get(FIELD_MATCHED_RACHA_NAME));
+        String icono = getStringValue(rachaData.get(FIELD_MATCHED_RACHA_ICON));
+        int days = getIntValue(rachaData.get(FIELD_MATCHED_RACHA_DAYS));
+
+        if (nombre.trim().isEmpty()) {
+            nombre = getString(R.string.detail_unknown_racha);
+        }
+
+        if (icono.trim().isEmpty()) {
+            icono = getString(R.string.default_racha_icon);
+        }
+
+        return new SharedRacha(nombre, icono, days);
+    }
+
+    private SharedRacha getLegacySharedRacha(DocumentSnapshot friendDocument) {
+        String nombre = friendDocument.getString(FIELD_MATCHED_RACHA_NAME);
+        String icono = friendDocument.getString(FIELD_MATCHED_RACHA_ICON);
+        Long daysValue = friendDocument.getLong(FIELD_MATCHED_RACHA_DAYS);
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return null;
+        }
+
+        if (icono == null || icono.trim().isEmpty()) {
+            icono = getString(R.string.default_racha_icon);
+        }
+
+        return new SharedRacha(nombre, icono, daysValue != null ? daysValue.intValue() : 0);
+    }
+
+    private String getStringValue(Object value) {
+        return value instanceof String ? (String) value : "";
+    }
+
+    private int getIntValue(Object value) {
+        if (value instanceof Long) {
+            return ((Long) value).intValue();
+        }
+
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+
+        return 0;
     }
 
     private String normalizeNombreKey(String value) {
@@ -346,10 +354,12 @@ public class FriendsActivity extends AppCompatActivity {
     private static class SharedRacha {
         final String nombre;
         final String icono;
+        final int days;
 
-        SharedRacha(String nombre, String icono) {
+        SharedRacha(String nombre, String icono, int days) {
             this.nombre = nombre;
             this.icono = icono;
+            this.days = days;
         }
     }
 }

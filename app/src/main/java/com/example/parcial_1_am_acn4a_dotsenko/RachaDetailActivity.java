@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -47,6 +48,7 @@ public class RachaDetailActivity extends AppCompatActivity {
     private static final String FIELD_MATCHED_RACHA_NAME = "matchedRachaName";
     private static final String FIELD_MATCHED_RACHA_ICON = "matchedRachaIcon";
     private static final String FIELD_MATCHED_RACHA_DAYS = "matchedRachaDays";
+    private static final String FIELD_SELECTED_RACHAS = "selectedRachas";
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
@@ -277,7 +279,7 @@ public class RachaDetailActivity extends AppCompatActivity {
         DocumentReference friendReference = getFriendReference(friendUserId);
         friendReference.get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
+                    if (documentSnapshot.exists() && hasSelectedRacha(documentSnapshot)) {
                         button.setText(R.string.detail_friend_added);
                     } else {
                         button.setEnabled(true);
@@ -316,10 +318,7 @@ public class RachaDetailActivity extends AppCompatActivity {
 
         friendReference
                 .set(friendData, SetOptions.merge())
-                .addOnSuccessListener(unused -> {
-                    button.setText(R.string.detail_friend_added);
-                    Toast.makeText(this, R.string.detail_friend_added_toast, Toast.LENGTH_SHORT).show();
-                })
+                .addOnSuccessListener(unused -> guardarRachaSeleccionada(friendReference, dias, button))
                 .addOnFailureListener(e -> {
                     button.setEnabled(true);
                     Toast.makeText(this, R.string.detail_friend_add_error, Toast.LENGTH_SHORT).show();
@@ -333,7 +332,45 @@ public class RachaDetailActivity extends AppCompatActivity {
                 .document(friendUserId);
     }
 
+    private boolean hasSelectedRacha(DocumentSnapshot friendDocument) {
+        Object selectedRachasValue = friendDocument.get(FIELD_SELECTED_RACHAS);
+        if (selectedRachasValue instanceof Map) {
+            Map<?, ?> selectedRachas = (Map<?, ?>) selectedRachasValue;
+            return selectedRachas.containsKey(nombreKey);
+        }
+
+        String matchedRachaName = friendDocument.getString(FIELD_MATCHED_RACHA_NAME);
+        return nombreKey.equals(normalizeNombreKey(matchedRachaName));
+    }
+
+    private void guardarRachaSeleccionada(DocumentReference friendReference, int dias, Button button) {
+        friendReference
+                .update(FieldPath.of(FIELD_SELECTED_RACHAS, nombreKey), getSelectedRachaData(dias))
+                .addOnSuccessListener(unused -> {
+                    button.setText(R.string.detail_friend_added);
+                    Toast.makeText(this, R.string.detail_friend_added_toast, Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    button.setEnabled(true);
+                    Toast.makeText(this, R.string.detail_friend_add_error, Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private Map<String, Object> getSelectedRachaData(int dias) {
+        Map<String, Object> selectedRacha = new HashMap<>();
+        selectedRacha.put(FIELD_NOMBRE_KEY, nombreKey);
+        selectedRacha.put(FIELD_MATCHED_RACHA_NAME, nombre);
+        selectedRacha.put(FIELD_MATCHED_RACHA_ICON, icono);
+        selectedRacha.put(FIELD_MATCHED_RACHA_DAYS, dias);
+        selectedRacha.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
+        return selectedRacha;
+    }
+
     private String normalizeNombreKey(String value) {
+        if (value == null) {
+            return "";
+        }
+
         return value.trim().toLowerCase(Locale.ROOT);
     }
 
