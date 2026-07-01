@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String COLLECTION_RACHAS = "rachas";
     private static final String FIELD_ICONO = "icono";
     private static final String FIELD_NOMBRE = "nombre";
+    private static final String FIELD_NOMBRE_KEY = "nombreKey";
+    private static final String FIELD_USER_ID = "userId";
     private static final String FIELD_DIAS = "dias";
     private static final String FIELD_LAST_COMPLETED_DATE = "lastCompletedDate";
     private static final String FIELD_CREATED_AT = "createdAt";
@@ -121,7 +123,9 @@ public class MainActivity extends AppCompatActivity {
 
                     rachas.clear();
                     for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
-                        rachas.add(Racha.fromDocument(documentSnapshot));
+                        Racha racha = Racha.fromDocument(documentSnapshot);
+                        rachas.add(racha);
+                        completarDatosDeBusquedaSiFaltan(documentSnapshot, racha);
                     }
 
                     ordenarRachas();
@@ -153,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         for (Racha racha : initialRachas) {
             DocumentReference rachaReference = rachasReference.document();
             racha.id = rachaReference.getId();
-            batch.set(rachaReference, racha.toMap(true));
+            batch.set(rachaReference, racha.toMap(currentUserId, true));
         }
 
         batch.commit()
@@ -232,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         Racha racha = new Racha(rachaReference.getId(), nombre, icono, dias, lastCompletedDate);
 
         rachaReference
-                .set(racha.toMap(true))
+                .set(racha.toMap(currentUserId, true))
                 .addOnSuccessListener(unused -> {
                     rachas.add(racha);
                     ordenarRachas();
@@ -274,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(RachaDetailActivity.EXTRA_ICONO, racha.icono);
                 intent.putExtra(RachaDetailActivity.EXTRA_DIAS, racha.dias);
                 intent.putExtra(RachaDetailActivity.EXTRA_COMPLETADA_HOY, completedToday);
+                intent.putExtra(RachaDetailActivity.EXTRA_NOMBRE_KEY, racha.nombreKey);
                 startActivity(intent);
             });
 
@@ -363,10 +368,31 @@ public class MainActivity extends AppCompatActivity {
         return storageDateFormat.format(calendar.getTime());
     }
 
+    private void completarDatosDeBusquedaSiFaltan(DocumentSnapshot documentSnapshot, Racha racha) {
+        if (documentSnapshot.contains(FIELD_USER_ID) && documentSnapshot.contains(FIELD_NOMBRE_KEY)) {
+            return;
+        }
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(FIELD_USER_ID, currentUserId);
+        updates.put(FIELD_NOMBRE_KEY, racha.nombreKey);
+        updates.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
+        documentSnapshot.getReference().update(updates);
+    }
+
+    private static String normalizeNombreKey(String nombre) {
+        if (nombre == null) {
+            return "";
+        }
+
+        return nombre.trim().toLowerCase(Locale.ROOT);
+    }
+
     private static class Racha {
         String id;
         String nombre;
         String icono;
+        String nombreKey;
         int dias;
         String lastCompletedDate;
 
@@ -374,6 +400,7 @@ public class MainActivity extends AppCompatActivity {
             this.id = id;
             this.nombre = nombre;
             this.icono = icono;
+            this.nombreKey = normalizeNombreKey(nombre);
             this.dias = dias;
             this.lastCompletedDate = lastCompletedDate;
         }
@@ -393,9 +420,11 @@ public class MainActivity extends AppCompatActivity {
             );
         }
 
-        Map<String, Object> toMap(boolean includeCreatedAt) {
+        Map<String, Object> toMap(String userId, boolean includeCreatedAt) {
             Map<String, Object> data = new HashMap<>();
+            data.put(FIELD_USER_ID, userId);
             data.put(FIELD_NOMBRE, nombre);
+            data.put(FIELD_NOMBRE_KEY, nombreKey);
             data.put(FIELD_ICONO, icono);
             data.put(FIELD_DIAS, dias);
             data.put(FIELD_LAST_COMPLETED_DATE, lastCompletedDate);
