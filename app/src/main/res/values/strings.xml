@@ -60,6 +60,17 @@
     <string name="dialog_new_racha_name_required">Ingresá el nombre de la racha.</string>
     <string name="dialog_new_racha_invalid_days">Los días deben ser un número válido.</string>
     <string name="dialog_new_racha_added">Racha agregada.</string>
+    <string name="racha_already_completed_today">Esta racha ya fue completada hoy.</string>
+    <string name="racha_load_failed">No se pudieron cargar las rachas.</string>
+    <string name="racha_seed_failed">No se pudieron crear las rachas iniciales.</string>
+    <string name="racha_save_failed">No se pudo guardar la racha.</string>
+    <string name="racha_update_failed">No se pudo actualizar la racha.</string>
+    <string name="seed_racha_yoga">Yoga</string>
+    <string name="seed_racha_english">Inglés</string>
+    <string name="seed_racha_spanish">Español</string>
+    <string name="seed_racha_running">Correr</string>
+    <string name="seed_racha_no_smoking">No fumar</string>
+    <string name="profile_no_rachas">Sin rachas</string>
     <string name="login_error_fill_fields">Por favor ingresa email y contraseña.</string>
     <string name="login_error_failed">No se pudo iniciar sesión.</string>
     <string name="register_error_fill_fields">Por favor completa todos los campos.</string>

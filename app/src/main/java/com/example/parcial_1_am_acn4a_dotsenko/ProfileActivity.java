@@ -10,9 +10,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class ProfileActivity extends AppCompatActivity {
+
+    private static final String COLLECTION_USERS = "users";
+    private static final String COLLECTION_RACHAS = "rachas";
+    private static final String FIELD_NOMBRE = "nombre";
+    private static final String FIELD_DIAS = "dias";
+    private static final String FIELD_LAST_COMPLETED_DATE = "lastCompletedDate";
 
     private TextView txtUserEmail;
     private TextView txtUserName;
@@ -43,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (currentUser == null) {
             txtUserName.setText("Usuario");
             txtUserEmail.setVisibility(View.GONE);
+            mostrarEstadisticas(0, 0, getString(R.string.profile_no_rachas), 0);
         } else {
             String email = currentUser.getEmail();
 
@@ -50,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
             txtUserEmail.setVisibility(email != null && !email.isEmpty() ? View.VISIBLE : View.GONE);
 
             cargarPerfilUsuario(currentUser.getUid(), email);
+            cargarEstadisticas(currentUser.getUid());
         }
 
         btnLogout.setOnClickListener(v -> {
@@ -60,23 +73,57 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        mostrarEstadisticasMock();
         BottomNavigationHelper.setup(this, R.id.menuPerfil);
     }
 
-    private void mostrarEstadisticasMock() {
-        int activeRachas = 5;
-        int completedToday = 3;
-        String bestRachaName = "No fumar";
-        int bestRachaDays = 60;
+    private void cargarEstadisticas(String userId) {
+        db.collection(COLLECTION_USERS)
+                .document(userId)
+                .collection(COLLECTION_RACHAS)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int activeRachas = queryDocumentSnapshots.size();
+                    int completedToday = 0;
+                    String bestRachaName = getString(R.string.profile_no_rachas);
+                    int bestRachaDays = 0;
 
+                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                        String lastCompletedDate = documentSnapshot.getString(FIELD_LAST_COMPLETED_DATE);
+                        if (getTodayDateKey().equals(lastCompletedDate)) {
+                            completedToday++;
+                        }
+
+                        Long diasValue = documentSnapshot.getLong(FIELD_DIAS);
+                        int dias = diasValue != null ? diasValue.intValue() : 0;
+                        if (dias > bestRachaDays) {
+                            bestRachaDays = dias;
+
+                            String nombre = documentSnapshot.getString(FIELD_NOMBRE);
+                            if (nombre != null && !nombre.trim().isEmpty()) {
+                                bestRachaName = nombre;
+                            }
+                        }
+                    }
+
+                    mostrarEstadisticas(activeRachas, completedToday, bestRachaName, bestRachaDays);
+                })
+                .addOnFailureListener(e ->
+                        mostrarEstadisticas(0, 0, getString(R.string.profile_no_rachas), 0));
+    }
+
+    private void mostrarEstadisticas(
+            int activeRachas,
+            int completedToday,
+            String bestRachaName,
+            int bestRachaDays
+    ) {
         txtActiveRachas.setText(getString(R.string.profile_active_rachas, activeRachas));
         txtCompletedToday.setText(getString(R.string.profile_completed_today, completedToday));
         txtBestRacha.setText(getString(R.string.profile_best_streak, bestRachaName, bestRachaDays));
     }
 
     private void cargarPerfilUsuario(String userId, String email) {
-        db.collection("users")
+        db.collection(COLLECTION_USERS)
                 .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -102,5 +149,10 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             txtUserName.setText("Usuario");
         }
+    }
+
+    private String getTodayDateKey() {
+        SimpleDateFormat storageDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        return storageDateFormat.format(Calendar.getInstance().getTime());
     }
 }
