@@ -1,6 +1,8 @@
 package com.example.parcial_1_am_acn4a_dotsenko;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,12 +42,14 @@ public class RachaDetailActivity extends AppCompatActivity {
     private static final String FIELD_DIAS = "dias";
     private static final String FIELD_FULL_NAME = "fullName";
     private static final String FIELD_EMAIL = "email";
+    private static final String FIELD_PHOTO_URL = "photoUrl";
     private static final String FIELD_FRIEND_USER_ID = "friendUserId";
     private static final String FIELD_MATCHED_RACHA_NAME = "matchedRachaName";
     private static final String FIELD_MATCHED_RACHA_ICON = "matchedRachaIcon";
     private static final String FIELD_MATCHED_RACHA_DAYS = "matchedRachaDays";
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
+    private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout sameRachaUsersContainer;
     private FirebaseFirestore db;
@@ -171,6 +176,7 @@ public class RachaDetailActivity extends AppCompatActivity {
                                     ownerUserId,
                                     getUserDisplayName(userDocument),
                                     userDocument.getString(FIELD_EMAIL),
+                                    userDocument.getString(FIELD_PHOTO_URL),
                                     dias
                             );
                             matches[0]++;
@@ -214,7 +220,13 @@ public class RachaDetailActivity extends AppCompatActivity {
         sameRachaUsersContainer.addView(textView);
     }
 
-    private void addCandidateRow(String friendUserId, String fullName, String email, int dias) {
+    private void addCandidateRow(
+            String friendUserId,
+            String fullName,
+            String email,
+            String photoUrl,
+            int dias
+    ) {
         LinearLayout row = new LinearLayout(this);
         LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -229,8 +241,8 @@ public class RachaDetailActivity extends AppCompatActivity {
 
         ImageView avatar = new ImageView(this);
         avatar.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
-        avatar.setImageResource(R.drawable.profile);
-        avatar.setColorFilter(ContextCompat.getColor(this, R.color.purple_main));
+        avatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        cargarAvatar(avatar, photoUrl, fullName, email);
         row.addView(avatar);
 
         LinearLayout texts = new LinearLayout(this);
@@ -273,7 +285,7 @@ public class RachaDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> button.setEnabled(true));
 
-        button.setOnClickListener(v -> guardarAmigo(friendUserId, fullName, email, dias, button));
+        button.setOnClickListener(v -> guardarAmigo(friendUserId, fullName, email, photoUrl, dias, button));
         row.addView(button);
 
         sameRachaUsersContainer.addView(row);
@@ -283,6 +295,7 @@ public class RachaDetailActivity extends AppCompatActivity {
             String friendUserId,
             String fullName,
             String email,
+            String photoUrl,
             int dias,
             Button button
     ) {
@@ -292,6 +305,7 @@ public class RachaDetailActivity extends AppCompatActivity {
         friendData.put(FIELD_FRIEND_USER_ID, friendUserId);
         friendData.put(FIELD_FULL_NAME, fullName);
         friendData.put(FIELD_EMAIL, email);
+        friendData.put(FIELD_PHOTO_URL, photoUrl);
         friendData.put(FIELD_MATCHED_RACHA_NAME, nombre);
         friendData.put(FIELD_MATCHED_RACHA_ICON, icono);
         friendData.put(FIELD_MATCHED_RACHA_DAYS, dias);
@@ -321,6 +335,32 @@ public class RachaDetailActivity extends AppCompatActivity {
 
     private String normalizeNombreKey(String value) {
         return value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private void cargarAvatar(ImageView avatar, String photoUrl, String fullName, String email) {
+        String imageUrl = !TextUtils.isEmpty(photoUrl)
+                ? photoUrl
+                : buildAvatarUrl(!TextUtils.isEmpty(fullName) ? fullName : email);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .circleCrop()
+                .into(avatar);
+    }
+
+    private String buildAvatarUrl(String fallbackText) {
+        String seed = !TextUtils.isEmpty(fallbackText) ? fallbackText : getString(R.string.detail_unknown_user);
+
+        return Uri.parse(AVATAR_API_URL)
+                .buildUpon()
+                .appendQueryParameter("name", seed)
+                .appendQueryParameter("background", "7E57C2")
+                .appendQueryParameter("color", "FFFFFF")
+                .appendQueryParameter("size", "256")
+                .build()
+                .toString();
     }
 
     private int dp(int value) {

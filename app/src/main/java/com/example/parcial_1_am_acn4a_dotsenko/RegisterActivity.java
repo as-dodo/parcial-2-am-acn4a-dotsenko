@@ -1,6 +1,7 @@
 package com.example.parcial_1_am_acn4a_dotsenko;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -75,6 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("fullName", fullName);
                         userData.put("phoneNumber", phoneNumber);
                         userData.put("email", email);
+                        userData.put("photoUrl", buildAvatarUrl(fullName, email));
 
                         UserProfileChangeRequest profileUpdates =
                                 new UserProfileChangeRequest.Builder()
@@ -99,5 +103,18 @@ public class RegisterActivity extends AppCompatActivity {
                                 });
                     });
         });
+    }
+
+    private String buildAvatarUrl(String fullName, String email) {
+        String seed = !TextUtils.isEmpty(fullName) ? fullName : email;
+
+        return Uri.parse(AVATAR_API_URL)
+                .buildUpon()
+                .appendQueryParameter("name", seed)
+                .appendQueryParameter("background", "7E57C2")
+                .appendQueryParameter("color", "FFFFFF")
+                .appendQueryParameter("size", "256")
+                .build()
+                .toString();
     }
 }

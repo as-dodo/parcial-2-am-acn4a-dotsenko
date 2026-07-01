@@ -2,7 +2,9 @@ package com.example.parcial_1_am_acn4a_dotsenko;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,10 +32,12 @@ public class FriendsActivity extends AppCompatActivity {
     private static final String COLLECTION_RACHAS = "rachas";
     private static final String FIELD_FULL_NAME = "fullName";
     private static final String FIELD_EMAIL = "email";
+    private static final String FIELD_PHOTO_URL = "photoUrl";
     private static final String FIELD_NOMBRE = "nombre";
     private static final String FIELD_NOMBRE_KEY = "nombreKey";
     private static final String FIELD_ICONO = "icono";
     private static final String FIELD_DIAS = "dias";
+    private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout friendsContainer;
     private FirebaseFirestore db;
@@ -142,6 +147,7 @@ public class FriendsActivity extends AppCompatActivity {
     private void addFriendRow(DocumentSnapshot friendDocument, Map<String, SharedRacha> myRachasByKey) {
         String fullName = friendDocument.getString(FIELD_FULL_NAME);
         String email = friendDocument.getString(FIELD_EMAIL);
+        String photoUrl = friendDocument.getString(FIELD_PHOTO_URL);
 
         if (fullName == null || fullName.trim().isEmpty()) {
             fullName = getString(R.string.detail_unknown_user);
@@ -168,8 +174,8 @@ public class FriendsActivity extends AppCompatActivity {
 
         ImageView avatar = new ImageView(this);
         avatar.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
-        avatar.setImageResource(R.drawable.profile);
-        avatar.setColorFilter(ContextCompat.getColor(this, R.color.purple_main));
+        avatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        cargarAvatar(avatar, photoUrl, fullName, email);
         row.addView(avatar);
 
         LinearLayout texts = new LinearLayout(this);
@@ -305,6 +311,32 @@ public class FriendsActivity extends AppCompatActivity {
         }
 
         return value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private void cargarAvatar(ImageView avatar, String photoUrl, String fullName, String email) {
+        String imageUrl = !TextUtils.isEmpty(photoUrl)
+                ? photoUrl
+                : buildAvatarUrl(!TextUtils.isEmpty(fullName) ? fullName : email);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .circleCrop()
+                .into(avatar);
+    }
+
+    private String buildAvatarUrl(String fallbackText) {
+        String seed = !TextUtils.isEmpty(fallbackText) ? fallbackText : getString(R.string.detail_unknown_user);
+
+        return Uri.parse(AVATAR_API_URL)
+                .buildUpon()
+                .appendQueryParameter("name", seed)
+                .appendQueryParameter("background", "7E57C2")
+                .appendQueryParameter("color", "FFFFFF")
+                .appendQueryParameter("size", "256")
+                .build()
+                .toString();
     }
 
     private int dp(int value) {

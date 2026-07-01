@@ -2,6 +2,7 @@ package com.example.parcial_1_am_acn4a_dotsenko;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -42,14 +44,18 @@ public class MainActivity extends AppCompatActivity {
     private static final String FIELD_NOMBRE = "nombre";
     private static final String FIELD_NOMBRE_KEY = "nombreKey";
     private static final String FIELD_USER_ID = "userId";
+    private static final String FIELD_FULL_NAME = "fullName";
+    private static final String FIELD_PHOTO_URL = "photoUrl";
     private static final String FIELD_DIAS = "dias";
     private static final String FIELD_LAST_COMPLETED_DATE = "lastCompletedDate";
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
+    private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout rachaContainer;
     private TextView txtCompletedToday;
     private TextView txtGreeting;
+    private ImageView imgAvatar;
     private final ArrayList<Racha> rachas = new ArrayList<>();
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -73,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
         currentUserId = currentUser.getUid();
 
         txtGreeting = findViewById(R.id.txtTitle);
-        cargarPerfilUsuario(currentUserId);
+        imgAvatar = findViewById(R.id.imgAvatar);
+        cargarPerfilUsuario(currentUserId, currentUser.getEmail());
 
         TextView txtToday = findViewById(R.id.txtToday);
         SimpleDateFormat readableDateFormat =
@@ -91,25 +98,57 @@ public class MainActivity extends AppCompatActivity {
         cargarRachas();
     }
 
-    private void cargarPerfilUsuario(String userId) {
+    private void cargarPerfilUsuario(String userId, String email) {
         db.collection(COLLECTION_USERS)
                 .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (!documentSnapshot.exists()) {
                         txtGreeting.setText(getString(R.string.greeting_default));
+                        cargarAvatar(null, email);
                         return;
                     }
 
-                    String fullName = documentSnapshot.getString("fullName");
+                    String fullName = documentSnapshot.getString(FIELD_FULL_NAME);
+                    String photoUrl = documentSnapshot.getString(FIELD_PHOTO_URL);
                     if (fullName == null || fullName.trim().isEmpty()) {
                         txtGreeting.setText(getString(R.string.greeting_default));
+                        cargarAvatar(photoUrl, email);
                     } else {
                         txtGreeting.setText(getString(R.string.greeting_user_format, fullName));
+                        cargarAvatar(photoUrl, fullName);
                     }
                 })
-                .addOnFailureListener(e ->
-                        txtGreeting.setText(getString(R.string.greeting_default)));
+                .addOnFailureListener(e -> {
+                    txtGreeting.setText(getString(R.string.greeting_default));
+                    cargarAvatar(null, email);
+                });
+    }
+
+    private void cargarAvatar(String photoUrl, String fallbackText) {
+        String imageUrl = !TextUtils.isEmpty(photoUrl)
+                ? photoUrl
+                : buildAvatarUrl(fallbackText);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.avatar_ana)
+                .error(R.drawable.avatar_ana)
+                .circleCrop()
+                .into(imgAvatar);
+    }
+
+    private String buildAvatarUrl(String fallbackText) {
+        String seed = !TextUtils.isEmpty(fallbackText) ? fallbackText : "Usuario";
+
+        return Uri.parse(AVATAR_API_URL)
+                .buildUpon()
+                .appendQueryParameter("name", seed)
+                .appendQueryParameter("background", "7E57C2")
+                .appendQueryParameter("color", "FFFFFF")
+                .appendQueryParameter("size", "256")
+                .build()
+                .toString();
     }
 
     private void cargarRachas() {
