@@ -137,15 +137,6 @@
             android:textStyle="bold"
             android:textColor="@color/purple_main" />
 
-        <TextView
-            android:id="@+id/txtRachasConAmigos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="@string/friend_rachas"
-            android:textSize="16sp"
-            android:textColor="@color/gray_light" />
-
     </LinearLayout>
 
     <ScrollView

@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -43,6 +44,7 @@ public class RachaDetailActivity extends AppCompatActivity {
     private static final String FIELD_MATCHED_RACHA_ICON = "matchedRachaIcon";
     private static final String FIELD_MATCHED_RACHA_DAYS = "matchedRachaDays";
     private static final String FIELD_CREATED_AT = "createdAt";
+    private static final String FIELD_UPDATED_AT = "updatedAt";
 
     private LinearLayout sameRachaUsersContainer;
     private FirebaseFirestore db;
@@ -258,6 +260,19 @@ public class RachaDetailActivity extends AppCompatActivity {
 
         Button button = new Button(this);
         button.setText(R.string.detail_add_friend);
+        button.setEnabled(false);
+
+        DocumentReference friendReference = getFriendReference(friendUserId);
+        friendReference.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        button.setText(R.string.detail_friend_added);
+                    } else {
+                        button.setEnabled(true);
+                    }
+                })
+                .addOnFailureListener(e -> button.setEnabled(true));
+
         button.setOnClickListener(v -> guardarAmigo(friendUserId, fullName, email, dias, button));
         row.addView(button);
 
@@ -281,14 +296,12 @@ public class RachaDetailActivity extends AppCompatActivity {
         friendData.put(FIELD_MATCHED_RACHA_ICON, icono);
         friendData.put(FIELD_MATCHED_RACHA_DAYS, dias);
         friendData.put(FIELD_CREATED_AT, FieldValue.serverTimestamp());
+        friendData.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
 
-        DocumentReference friendReference = db.collection(COLLECTION_USERS)
-                .document(currentUserId)
-                .collection(COLLECTION_FRIENDS)
-                .document(friendUserId);
+        DocumentReference friendReference = getFriendReference(friendUserId);
 
         friendReference
-                .set(friendData)
+                .set(friendData, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
                     button.setText(R.string.detail_friend_added);
                     Toast.makeText(this, R.string.detail_friend_added_toast, Toast.LENGTH_SHORT).show();
@@ -297,6 +310,13 @@ public class RachaDetailActivity extends AppCompatActivity {
                     button.setEnabled(true);
                     Toast.makeText(this, R.string.detail_friend_add_error, Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private DocumentReference getFriendReference(String friendUserId) {
+        return db.collection(COLLECTION_USERS)
+                .document(currentUserId)
+                .collection(COLLECTION_FRIENDS)
+                .document(friendUserId);
     }
 
     private String normalizeNombreKey(String value) {

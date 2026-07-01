@@ -89,6 +89,11 @@
     <string name="friends_empty">Todavía no agregaste amigos.</string>
     <string name="friends_load_error">No se pudieron cargar tus amigos.</string>
     <string name="friends_matched_racha_format">%1$s Racha en común: %2$s</string>
+    <string name="friends_common_rachas_title">Rachas en común</string>
+    <string name="friends_common_rachas_loading">Cargando rachas en común...</string>
+    <string name="friends_common_rachas_empty">No hay rachas en común para mostrar.</string>
+    <string name="friends_common_rachas_error">No se pudieron cargar las rachas en común.</string>
+    <string name="friends_common_racha_format">%1$s %2$s</string>
     <string name="login_error_fill_fields">Por favor ingresa email y contraseña.</string>
     <string name="login_error_failed">No se pudo iniciar sesión.</string>
     <string name="register_error_fill_fields">Por favor completa todos los campos.</string>
