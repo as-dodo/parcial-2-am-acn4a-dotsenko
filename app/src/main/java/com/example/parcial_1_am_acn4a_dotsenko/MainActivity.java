@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String COLLECTION_USERS = "users";
     private static final String COLLECTION_RACHAS = "rachas";
+    private static final String COLLECTION_COMPLETIONS = "completions";
     private static final String FIELD_ICONO = "icono";
     private static final String FIELD_NOMBRE = "nombre";
     private static final String FIELD_NOMBRE_KEY = "nombreKey";
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String FIELD_LAST_COMPLETED_DATE = "lastCompletedDate";
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
+    private static final String FIELD_DATE = "date";
+    private static final String FIELD_COMPLETED_AT = "completedAt";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout rachaContainer;
@@ -197,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
             DocumentReference rachaReference = rachasReference.document();
             racha.id = rachaReference.getId();
             batch.set(rachaReference, racha.toMap(currentUserId, true));
+            agregarHistorialCompletionsAlBatch(batch, rachaReference, racha);
         }
 
         batch.commit()
@@ -274,8 +278,11 @@ public class MainActivity extends AppCompatActivity {
         String lastCompletedDate = dias > 0 ? getYesterdayDateKey() : null;
         Racha racha = new Racha(rachaReference.getId(), nombre, icono, dias, lastCompletedDate);
 
-        rachaReference
-                .set(racha.toMap(currentUserId, true))
+        WriteBatch batch = db.batch();
+        batch.set(rachaReference, racha.toMap(currentUserId, true));
+        agregarHistorialCompletionsAlBatch(batch, rachaReference, racha);
+
+        batch.commit()
                 .addOnSuccessListener(unused -> {
                     rachas.add(racha);
                     ordenarRachas();
@@ -337,14 +344,21 @@ public class MainActivity extends AppCompatActivity {
 
         imgFire.setEnabled(false);
 
+        DocumentReference rachaReference = getRachasReference().document(racha.id);
+
         Map<String, Object> updates = new HashMap<>();
         updates.put(FIELD_DIAS, nextDias);
         updates.put(FIELD_LAST_COMPLETED_DATE, today);
         updates.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
 
-        getRachasReference()
-                .document(racha.id)
-                .update(updates)
+        WriteBatch batch = db.batch();
+        batch.update(rachaReference, updates);
+        batch.set(
+                rachaReference.collection(COLLECTION_COMPLETIONS).document(today),
+                buildCompletionMap(today, racha.nombre, racha.icono)
+        );
+
+        batch.commit()
                 .addOnSuccessListener(unused -> {
                     racha.dias = nextDias;
                     racha.lastCompletedDate = today;
@@ -355,6 +369,59 @@ public class MainActivity extends AppCompatActivity {
                     imgFire.setEnabled(true);
                     Toast.makeText(this, R.string.racha_update_failed, Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    /**
+     * Writes completion history for the last {@code dias} days ending at {@code lastCompletedDate}.
+     * Keeps seed/new rachas consistent with the day counter for the calendar screen.
+     */
+    private void agregarHistorialCompletionsAlBatch(
+            WriteBatch batch,
+            DocumentReference rachaReference,
+            Racha racha
+    ) {
+        if (racha.dias <= 0 || TextUtils.isEmpty(racha.lastCompletedDate)) {
+            return;
+        }
+
+        Calendar calendar = parseDateKey(racha.lastCompletedDate);
+        if (calendar == null) {
+            return;
+        }
+
+        for (int i = 0; i < racha.dias; i++) {
+            String dateKey = formatDateKey(calendar);
+            batch.set(
+                    rachaReference.collection(COLLECTION_COMPLETIONS).document(dateKey),
+                    buildCompletionMap(dateKey, racha.nombre, racha.icono)
+            );
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+        }
+    }
+
+    private Map<String, Object> buildCompletionMap(String dateKey, String nombre, String icono) {
+        Map<String, Object> completion = new HashMap<>();
+        completion.put(FIELD_DATE, dateKey);
+        completion.put(FIELD_NOMBRE, nombre);
+        completion.put(FIELD_ICONO, icono);
+        completion.put(FIELD_COMPLETED_AT, FieldValue.serverTimestamp());
+        return completion;
+    }
+
+    private Calendar parseDateKey(String dateKey) {
+        try {
+            SimpleDateFormat storageDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            Date date = storageDateFormat.parse(dateKey);
+            if (date == null) {
+                return null;
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return calendar;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private void ordenarRachas() {
