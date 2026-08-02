@@ -37,7 +37,6 @@
             android:id="@+id/monthTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Abril 2026"
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="@color/black"
@@ -63,21 +62,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● Completado"
+                android:text="@string/calendar_legend_completed"
                 android:textColor="@color/green"
                 android:layout_marginEnd="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● Parcial"
+                android:text="@string/calendar_legend_partial"
                 android:textColor="@color/orange"
                 android:layout_marginEnd="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● Pendiente"
+                android:text="@string/calendar_legend_pending"
                 android:textColor="@color/pink" />
 
         </LinearLayout>
@@ -110,13 +109,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Días completados"
+                    android:text="@string/calendar_days_completed_label"
                     android:textColor="@color/gray_dark" />
 
                 <TextView
+                    android:id="@+id/txtDaysCompleted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="18"
+                    android:text="0"
                     android:textStyle="bold"
                     android:textSize="26sp"
                     android:layout_marginTop="4dp" />
@@ -135,13 +135,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mejor racha"
+                    android:text="@string/calendar_best_streak_label"
                     android:textColor="@color/gray_dark" />
 
                 <TextView
+                    android:id="@+id/txtBestStreak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="12 días"
+                    android:text="@string/calendar_best_streak_empty"
                     android:textStyle="bold"
                     android:textSize="22sp"
                     android:layout_marginTop="4dp" />
@@ -159,9 +160,10 @@
             android:padding="12dp">
 
             <TextView
+                android:id="@+id/txtHabitsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rachas completadas hoy"
+                android:text="@string/calendar_habits_today_title"
                 android:textStyle="bold"
                 android:textColor="@color/purple_main" />
 
