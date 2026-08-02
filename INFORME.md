@@ -103,6 +103,7 @@ Desde Inicio → ver detalle → agregar amigo o eliminar racha → volver.
 **Funcionalidades**
 - Auth-guard (sin sesión → Login).
 - Mes actual real.
+- Navegación entre meses anteriores para consultar el historial; permite volver hasta el mes actual.
 - Días coloreados según completions:
   - verde: todas las rachas del día;
   - naranja: parcial;

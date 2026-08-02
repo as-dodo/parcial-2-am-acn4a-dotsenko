@@ -92,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/blue"
+            android:backgroundTint="@color/purple_main"
             android:text="@string/btn_edit_profile"
             android:textColor="@color/white" />
 

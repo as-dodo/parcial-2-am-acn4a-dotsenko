@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,6 +48,8 @@ public class CalendarActivity extends AppCompatActivity {
     private TextView txtDaysCompleted;
     private TextView txtBestStreak;
     private TextView txtHabitsSectionTitle;
+    private Button btnPreviousMonth;
+    private Button btnNextMonth;
     private GridLayout calendarGrid;
     private LinearLayout habitsList;
 
@@ -56,6 +59,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     private Calendar visibleMonth;
     private String selectedDateKey;
+    private int monthLoadGeneration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,12 +87,17 @@ public class CalendarActivity extends AppCompatActivity {
         txtDaysCompleted = findViewById(R.id.txtDaysCompleted);
         txtBestStreak = findViewById(R.id.txtBestStreak);
         txtHabitsSectionTitle = findViewById(R.id.txtHabitsSectionTitle);
+        btnPreviousMonth = findViewById(R.id.btnPreviousMonth);
+        btnNextMonth = findViewById(R.id.btnNextMonth);
         calendarGrid = findViewById(R.id.calendarGrid);
         habitsList = findViewById(R.id.habitsList);
 
         visibleMonth = Calendar.getInstance();
         visibleMonth.set(Calendar.DAY_OF_MONTH, 1);
         selectedDateKey = formatDateKey(Calendar.getInstance());
+
+        btnPreviousMonth.setOnClickListener(v -> cambiarMes(-1));
+        btnNextMonth.setOnClickListener(v -> cambiarMes(1));
 
         BottomNavigationHelper.setup(this, R.id.menuCalendario);
     }
@@ -102,6 +111,7 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void cargarDatosDelMes() {
+        int loadGeneration = ++monthLoadGeneration;
         String monthStart = getMonthStartKey(visibleMonth);
         String monthEnd = getMonthEndKey(visibleMonth);
 
@@ -110,6 +120,10 @@ public class CalendarActivity extends AppCompatActivity {
                 .collection(COLLECTION_RACHAS)
                 .get()
                 .addOnSuccessListener(rachaSnapshots -> {
+                    if (loadGeneration != monthLoadGeneration) {
+                        return;
+                    }
+
                     rachas.clear();
                     completionsByDate.clear();
 
@@ -137,6 +151,10 @@ public class CalendarActivity extends AppCompatActivity {
 
                     Tasks.whenAllSuccess(completionTasks)
                             .addOnSuccessListener(results -> {
+                                if (loadGeneration != monthLoadGeneration) {
+                                    return;
+                                }
+
                                 for (int i = 0; i < results.size(); i++) {
                                     QuerySnapshot snapshot = (QuerySnapshot) results.get(i);
                                     RachaInfo racha = loadedRachas.get(i);
@@ -173,11 +191,19 @@ public class CalendarActivity extends AppCompatActivity {
                                 renderUi();
                             })
                             .addOnFailureListener(e -> {
+                                if (loadGeneration != monthLoadGeneration) {
+                                    return;
+                                }
+
                                 Toast.makeText(this, R.string.calendar_load_error, Toast.LENGTH_SHORT).show();
                                 renderUi();
                             });
                 })
                 .addOnFailureListener(e -> {
+                    if (loadGeneration != monthLoadGeneration) {
+                        return;
+                    }
+
                     Toast.makeText(this, R.string.calendar_load_error, Toast.LENGTH_SHORT).show();
                     rachas.clear();
                     completionsByDate.clear();
@@ -199,6 +225,49 @@ public class CalendarActivity extends AppCompatActivity {
             title = Character.toUpperCase(title.charAt(0)) + title.substring(1);
         }
         monthTitle.setText(title);
+        btnNextMonth.setEnabled(!isCurrentMonth());
+        btnNextMonth.setAlpha(btnNextMonth.isEnabled() ? 1f : 0.4f);
+    }
+
+    private void cambiarMes(int monthDelta) {
+        Calendar targetMonth = (Calendar) visibleMonth.clone();
+        targetMonth.add(Calendar.MONTH, monthDelta);
+        targetMonth.set(Calendar.DAY_OF_MONTH, 1);
+
+        if (isAfterCurrentMonth(targetMonth)) {
+            return;
+        }
+
+        visibleMonth = targetMonth;
+        selectedDateKey = isCurrentMonth()
+                ? formatDateKey(Calendar.getInstance())
+                : getMonthStartKey(visibleMonth);
+
+        renderUi();
+        cargarDatosDelMes();
+    }
+
+    private boolean isCurrentMonth() {
+        Calendar today = Calendar.getInstance();
+        return visibleMonth.get(Calendar.YEAR) == today.get(Calendar.YEAR)
+                && visibleMonth.get(Calendar.MONTH) == today.get(Calendar.MONTH);
+    }
+
+    private boolean isAfterCurrentMonth(Calendar month) {
+        Calendar currentMonth = Calendar.getInstance();
+        currentMonth.set(Calendar.DAY_OF_MONTH, 1);
+        currentMonth.set(Calendar.HOUR_OF_DAY, 0);
+        currentMonth.set(Calendar.MINUTE, 0);
+        currentMonth.set(Calendar.SECOND, 0);
+        currentMonth.set(Calendar.MILLISECOND, 0);
+
+        Calendar normalizedMonth = (Calendar) month.clone();
+        normalizedMonth.set(Calendar.DAY_OF_MONTH, 1);
+        normalizedMonth.set(Calendar.HOUR_OF_DAY, 0);
+        normalizedMonth.set(Calendar.MINUTE, 0);
+        normalizedMonth.set(Calendar.SECOND, 0);
+        normalizedMonth.set(Calendar.MILLISECOND, 0);
+        return normalizedMonth.after(currentMonth);
     }
 
     private void dibujarCalendario() {

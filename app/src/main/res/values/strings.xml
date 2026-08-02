@@ -47,6 +47,10 @@
     <string name="default_racha_icon">⭐</string>
     <string name="title_calendar">Calendario</string>
     <string name="subtitle_calendar">Seguimiento de tus rachas por día según lo que completaste.</string>
+    <string name="calendar_previous_month">Mes anterior</string>
+    <string name="calendar_next_month">Mes siguiente</string>
+    <string name="calendar_previous_month_symbol">‹</string>
+    <string name="calendar_next_month_symbol">›</string>
     <string name="calendar_legend_completed">● Completado</string>
     <string name="calendar_legend_partial">● Parcial</string>
     <string name="calendar_legend_pending">● Pendiente</string>
