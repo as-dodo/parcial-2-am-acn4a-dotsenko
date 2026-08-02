@@ -6,8 +6,8 @@
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"
-    android:minHeight="120dp"
-    android:padding="24dp"
+    android:minHeight="@dimen/empty_state_min_height"
+    android:padding="@dimen/spacing_xlarge"
     android:text="@string/home_empty_rachas"
     android:textColor="@color/gray_dark"
-    android:textSize="16sp" />
+    android:textSize="@dimen/body_text_size" />

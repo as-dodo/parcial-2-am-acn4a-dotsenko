@@ -4,33 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="@dimen/spacing_large"
     android:background="@drawable/screen_bg">
 
     <TextView
         android:id="@+id/txtPageTitle"
+        android:accessibilityHeading="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="28sp"
+        android:textSize="@dimen/title_text_size"
         android:textColor="@color/purple_main"
         android:textStyle="bold"
-        android:paddingTop="8dp" />
+        android:paddingTop="@dimen/spacing_small" />
 
     <TextView
         android:id="@+id/txtPageSubtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/spacing_xsmall"
         android:textColor="@color/gray_dark"
-        android:textSize="14sp" />
+        android:textSize="@dimen/small_text_size" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_large"
         android:background="@color/white"
-        android:padding="12dp"
-        android:elevation="4dp"
+        android:padding="@dimen/spacing_medium"
+        android:elevation="@dimen/elevation_medium"
         android:orientation="vertical">
 
         <LinearLayout
@@ -41,15 +42,15 @@
 
             <Button
                 android:id="@+id/btnPreviousMonth"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/touch_target_min"
+                android:layout_height="@dimen/touch_target_min"
                 android:backgroundTint="@color/purple_main"
                 android:contentDescription="@string/calendar_previous_month"
                 android:minWidth="0dp"
                 android:padding="0dp"
                 android:text="@string/calendar_previous_month_symbol"
                 android:textColor="@color/white"
-                android:textSize="24sp" />
+                android:textSize="@dimen/large_text_size" />
 
             <TextView
                 android:id="@+id/monthTitle"
@@ -58,20 +59,20 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="@dimen/section_text_size"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnNextMonth"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/touch_target_min"
+                android:layout_height="@dimen/touch_target_min"
                 android:backgroundTint="@color/purple_main"
                 android:contentDescription="@string/calendar_next_month"
                 android:minWidth="0dp"
                 android:padding="0dp"
                 android:text="@string/calendar_next_month_symbol"
                 android:textColor="@color/white"
-                android:textSize="24sp" />
+                android:textSize="@dimen/large_text_size" />
 
         </LinearLayout>
 
@@ -83,13 +84,13 @@
             android:rowCount="6"
             android:alignmentMode="alignMargins"
             android:useDefaultMargins="true"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="@dimen/spacing_medium" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:gravity="center_horizontal">
 
             <TextView
@@ -97,14 +98,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/calendar_legend_completed"
                 android:textColor="@color/green"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginEnd="@dimen/spacing_large" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/calendar_legend_partial"
                 android:textColor="@color/orange"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginEnd="@dimen/spacing_large" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -121,7 +122,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="@dimen/spacing_medium">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -135,9 +136,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:padding="12dp"
+                android:padding="@dimen/spacing_medium"
                 android:orientation="vertical"
-                android:layout_marginEnd="8dp">
+                android:layout_marginEnd="@dimen/spacing_small">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -151,8 +152,8 @@
                     android:layout_height="wrap_content"
                     android:text="0"
                     android:textStyle="bold"
-                    android:textSize="26sp"
-                    android:layout_marginTop="4dp" />
+                    android:textSize="@dimen/racha_icon_text_size"
+                    android:layout_marginTop="@dimen/spacing_xsmall" />
 
             </LinearLayout>
 
@@ -161,9 +162,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:padding="12dp"
+                android:padding="@dimen/spacing_medium"
                 android:orientation="vertical"
-                android:layout_marginStart="8dp">
+                android:layout_marginStart="@dimen/spacing_small">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -177,8 +178,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/calendar_best_streak_empty"
                     android:textStyle="bold"
-                    android:textSize="22sp"
-                    android:layout_marginTop="4dp" />
+                    android:textSize="@dimen/section_title_text_size"
+                    android:layout_marginTop="@dimen/spacing_xsmall" />
 
             </LinearLayout>
 
@@ -189,9 +190,9 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:background="@color/white"
-            android:padding="12dp">
+            android:padding="@dimen/spacing_medium">
 
             <TextView
                 android:id="@+id/txtHabitsSectionTitle"
@@ -205,7 +206,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/spacing_small"
                 android:fillViewport="true"
                 android:scrollbars="vertical">
 
@@ -224,12 +225,12 @@
     <LinearLayout
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="@dimen/spacing_small">
 
         <LinearLayout
             android:id="@+id/menuInicio"
@@ -240,9 +241,11 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:src="@drawable/home"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -250,7 +253,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/menu_inicio"
                 android:textColor="@color/gray_dark"
-                android:textSize="12sp"
+                android:textSize="@dimen/caption_text_size"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -263,9 +266,11 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:src="@drawable/calendar"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -273,7 +278,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/menu_calendario"
                 android:textColor="@color/gray_dark"
-                android:textSize="12sp"
+                android:textSize="@dimen/caption_text_size"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -286,9 +291,11 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:src="@drawable/friends"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -296,7 +303,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/menu_amigos"
                 android:textColor="@color/gray_dark"
-                android:textSize="12sp"
+                android:textSize="@dimen/caption_text_size"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -309,9 +316,11 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:src="@drawable/profile"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -319,7 +328,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/menu_perfil"
                 android:textColor="@color/gray_dark"
-                android:textSize="12sp"
+                android:textSize="@dimen/caption_text_size"
                 android:textStyle="bold" />
         </LinearLayout>
 

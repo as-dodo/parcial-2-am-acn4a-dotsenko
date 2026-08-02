@@ -427,6 +427,12 @@ public class MainActivity extends AppCompatActivity {
             imgFire.setImageResource(completedToday
                     ? R.drawable.ic_fire_active
                     : R.drawable.ic_fire_inactive);
+            imgFire.setContentDescription(getString(
+                    completedToday
+                            ? R.string.racha_completed_accessibility
+                            : R.string.racha_mark_complete_accessibility,
+                    racha.nombre
+            ));
 
             imgFire.setOnClickListener(v -> completarRachaHoy(racha, imgFire));
 

@@ -5,39 +5,40 @@
     android:layout_height="match_parent"
     android:background="@drawable/screen_bg"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="@dimen/spacing_xlarge">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="16dp">
+        android:paddingBottom="@dimen/spacing_large">
 
         <TextView
             android:id="@+id/txtProfileHeader"
+            android:accessibilityHeading="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_profile"
             android:textColor="@color/black"
-            android:textSize="28sp"
+            android:textSize="@dimen/title_text_size"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="@dimen/spacing_compact"
             android:text="@string/subtitle_profile"
             android:textColor="@color/purple_main"
-            android:textSize="14sp" />
+            android:textSize="@dimen/small_text_size" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/spacing_xsmall"
         android:background="@drawable/light_card_bg"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="@dimen/spacing_20">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,12 +48,12 @@
 
             <ImageView
                 android:id="@+id/imgProfile"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="@dimen/element_size_large"
+                android:layout_height="@dimen/element_size_large"
                 android:src="@drawable/profile"
                 android:contentDescription="@string/profile_photo_desc"
                 android:scaleType="centerCrop"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginEnd="@dimen/spacing_large" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -65,24 +66,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/purple_main"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/emphasis_text_size"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtUserEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
                     android:textColor="@color/gray_dark"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/small_text_size" />
 
                 <TextView
                     android:id="@+id/txtUserPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
                     android:textColor="@color/gray_dark"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/small_text_size"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -91,16 +92,16 @@
             android:id="@+id/btnEditProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_large"
             android:backgroundTint="@color/purple_main"
             android:text="@string/btn_edit_profile"
             android:textColor="@color/white" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="18dp"
+            android:layout_height="@dimen/divider_thickness"
+            android:layout_marginTop="@dimen/spacing_20"
+            android:layout_marginBottom="@dimen/spacing_18"
             android:background="@color/gray_light" />
 
         <LinearLayout
@@ -128,32 +129,33 @@
                         android:layout_gravity="center"
                         android:src="@drawable/ic_fire_active"
                         app:tint="@color/orange"
-                        android:contentDescription="@string/fire_icon" />
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/spacing_regular"
                     android:text="@string/profile_active_rachas_label"
                     android:textColor="@color/gray_light"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/caption_text_size"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtActiveRachas"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="@dimen/spacing_compact"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/emphasis_text_size"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <View
-                android:layout_width="1dp"
+                android:layout_width="@dimen/divider_thickness"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="12dp"
+                android:layout_marginHorizontal="@dimen/spacing_medium"
                 android:background="@color/gray_light" />
 
             <LinearLayout
@@ -174,32 +176,33 @@
                         android:layout_gravity="center"
                         android:src="@drawable/ic_check"
                         app:tint="@color/green"
-                        android:contentDescription="@string/fire_icon" />
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/spacing_regular"
                     android:text="@string/profile_completed_today_label"
                     android:textColor="@color/gray_light"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/caption_text_size"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtCompletedToday"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="@dimen/spacing_compact"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/emphasis_text_size"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <View
-                android:layout_width="1dp"
+                android:layout_width="@dimen/divider_thickness"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="12dp"
+                android:layout_marginHorizontal="@dimen/spacing_medium"
                 android:background="@color/gray_light" />
 
             <LinearLayout
@@ -220,25 +223,26 @@
                         android:layout_gravity="center"
                         android:src="@drawable/ic_trophy"
                         app:tint="@color/blue"
-                        android:contentDescription="@string/fire_icon" />
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/spacing_regular"
                     android:text="@string/profile_best_streak_label"
                     android:textColor="@color/gray_light"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/caption_text_size"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtBestRacha"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="@dimen/spacing_compact"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/body_text_size"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:maxLines="2" />
@@ -250,47 +254,47 @@
         android:id="@+id/profileInspirationContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_large"
         android:background="@drawable/light_card_bg"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="@dimen/spacing_medium">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/profile_inspiration_title"
             android:textColor="@color/purple_main"
-            android:textSize="14sp"
+            android:textSize="@dimen/small_text_size"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtProfileDailyQuote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="@dimen/spacing_compact"
             android:text="@string/profile_quote_loading"
             android:textColor="@color/black"
-            android:textSize="14sp"
+            android:textSize="@dimen/small_text_size"
             android:textStyle="italic" />
 
         <TextView
             android:id="@+id/txtProfileDailyQuoteAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/spacing_xsmall"
             android:gravity="end"
             android:textColor="@color/gray_dark"
-            android:textSize="13sp" />
+            android:textSize="@dimen/menu_text_size" />
 
         <TextView
             android:id="@+id/txtProfileQuoteSource"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/spacing_xsmall"
             android:gravity="end"
             android:text="@string/profile_quote_source"
             android:textColor="@color/purple_main"
-            android:textSize="12sp" />
+            android:textSize="@dimen/caption_text_size" />
 
     </LinearLayout>
 
@@ -298,7 +302,7 @@
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:backgroundTint="@color/purple_main"
         android:text="@string/btn_logout"
         android:textColor="@color/white" />
@@ -311,12 +315,12 @@
     <LinearLayout
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="@dimen/spacing_small">
 
         <LinearLayout
             android:id="@+id/menuInicio"
@@ -330,6 +334,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/home"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -353,6 +359,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/calendar"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -376,6 +384,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/friends"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -399,6 +409,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/profile"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/screen_bg"
-    android:padding="24dp">
+    android:padding="@dimen/spacing_xlarge">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,39 +12,40 @@
         android:gravity="center_horizontal">
 
         <TextView
+            android:accessibilityHeading="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="@dimen/spacing_xxlarge"
             android:text="@string/login_title"
             android:textColor="@color/purple_main"
-            android:textSize="28sp"
+            android:textSize="@dimen/title_text_size"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="@dimen/spacing_xxlarge"
             android:background="@drawable/light_card_bg"
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
-            android:padding="16dp" />
+            android:padding="@dimen/spacing_large" />
 
         <EditText
             android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_large"
             android:background="@drawable/light_card_bg"
             android:hint="@string/hint_password"
             android:inputType="textPassword"
-            android:padding="16dp" />
+            android:padding="@dimen/spacing_large" />
 
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_xlarge"
             android:backgroundTint="@color/purple_main"
             android:text="@string/button_login"
             android:textColor="@color/white" />
@@ -53,7 +54,7 @@
             android:id="@+id/btnCreateAccount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:backgroundTint="@color/gray_dark"
             android:text="@string/button_create_account"
             android:textColor="@color/white" />

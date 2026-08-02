@@ -4,17 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="@dimen/spacing_xlarge"
     android:background="@drawable/screen_bg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginBottom="10dp">
+        android:layout_height="@dimen/element_size_large"
+        android:layout_marginBottom="@dimen/spacing_regular">
 
         <TextView
             android:id="@+id/txtTitle"
+            android:accessibilityHeading="true"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/spacing_medium"
@@ -43,7 +44,7 @@
             android:id="@+id/imgAvatar"
             android:layout_width="@dimen/avatar_size"
             android:layout_height="@dimen/avatar_size"
-            android:contentDescription="@string/avatar_ana"
+            android:contentDescription="@string/profile_photo_desc"
             android:scaleType="centerCrop"
             android:src="@drawable/avatar_ana"
             app:shapeAppearanceOverlay="@style/CircleImage"
@@ -58,23 +59,24 @@
         android:id="@+id/todaySummaryContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="@dimen/spacing_regular"
         android:background="@drawable/light_card_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="@dimen/spacing_small">
 
         <ImageView
             android:id="@+id/imgTodayFire"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:contentDescription="@string/fire_icon"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
             android:src="@drawable/ic_fire_active" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="@dimen/spacing_regular"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -91,20 +93,20 @@
                 android:id="@+id/txtCompletedToday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="@dimen/spacing_compact"
                 android:text="@string/completed_today_preview"
                 android:textColor="@color/gray_light"
-                android:textSize="20sp"
+                android:textSize="@dimen/emphasis_text_size"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txtTodayMotivation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/spacing_xsmall"
                 android:text="@string/today_motivation"
                 android:textColor="@color/gray_dark"
-                android:textSize="16sp" />
+                android:textSize="@dimen/body_text_size" />
 
         </LinearLayout>
 
@@ -113,9 +115,9 @@
 
     <Button
         android:id="@+id/btnNuevaRacha"
-        android:layout_width="358dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/spacing_regular"
         android:text="@string/btn_new_racha"
         android:backgroundTint="@color/purple_main"
         android:textColor="@color/white"/>
@@ -126,14 +128,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="@dimen/spacing_large">
 
         <TextView
             android:id="@+id/txtTusRachas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/your_rachas"
-            android:textSize="22sp"
+            android:textSize="@dimen/section_title_text_size"
             android:textStyle="bold"
             android:textColor="@color/purple_main" />
 
@@ -143,7 +145,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="@dimen/spacing_medium">
 
         <LinearLayout
             android:id="@+id/rachaContainer"
@@ -156,12 +158,12 @@
     <LinearLayout
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="@dimen/spacing_small">
 
 
         <!-- INICIO -->
@@ -177,6 +179,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/home"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/purple_main" />
             <TextView
                 android:layout_width="wrap_content"
@@ -199,6 +203,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/calendar"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
             <TextView
                 android:layout_width="wrap_content"
@@ -221,6 +227,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/friends"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
             <TextView
                 android:layout_width="wrap_content"
@@ -243,6 +251,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/profile"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
             <TextView
                 android:layout_width="wrap_content"

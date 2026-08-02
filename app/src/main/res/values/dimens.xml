@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="padding_activity">24dp</dimen>
+    <dimen name="spacing_xlarge">24dp</dimen>
     <dimen name="margin_bottom_header">16dp</dimen>
     <dimen name="margin_top_today">4dp</dimen>
     <dimen name="avatar_size">72dp</dimen>
@@ -12,6 +12,31 @@
     <dimen name="menu_text_size">13sp</dimen>
     <dimen name="spacing_small">8dp</dimen>
     <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_xsmall">4dp</dimen>
+    <dimen name="spacing_compact">6dp</dimen>
+    <dimen name="spacing_regular">10dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_18">18dp</dimen>
+    <dimen name="spacing_20">20dp</dimen>
+    <dimen name="spacing_28">28dp</dimen>
+    <dimen name="spacing_xxlarge">32dp</dimen>
+    <dimen name="divider_thickness">1dp</dimen>
+    <dimen name="elevation_small">2dp</dimen>
+    <dimen name="elevation_medium">4dp</dimen>
+    <dimen name="icon_size_large">36dp</dimen>
+    <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="detail_icon_text_size">56sp</dimen>
+    <dimen name="bottom_nav_height">76dp</dimen>
+    <dimen name="element_size_large">80dp</dimen>
+    <dimen name="empty_state_min_height">120dp</dimen>
+    <dimen name="detail_button_min_width">160dp</dimen>
+    <dimen name="caption_text_size">12sp</dimen>
+    <dimen name="small_text_size">14sp</dimen>
+    <dimen name="section_text_size">18sp</dimen>
+    <dimen name="emphasis_text_size">20sp</dimen>
+    <dimen name="section_title_text_size">22sp</dimen>
+    <dimen name="large_text_size">24sp</dimen>
+    <dimen name="racha_icon_text_size">26sp</dimen>
     <dimen name="stat_icon_container">52dp</dimen>
     <dimen name="stat_icon_size">24dp</dimen>
 

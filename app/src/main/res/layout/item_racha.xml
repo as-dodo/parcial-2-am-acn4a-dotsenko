@@ -2,24 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="@dimen/spacing_small"
     android:background="@drawable/racha_card_bg"
-    android:elevation="2dp"
+    android:elevation="@dimen/elevation_small"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="@dimen/spacing_regular">
 
     <TextView
         android:id="@+id/txtRachaIcon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/touch_target_min"
+        android:layout_height="@dimen/touch_target_min"
         android:gravity="center"
-        android:textSize="26sp" />
+        android:textSize="@dimen/racha_icon_text_size" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="@dimen/spacing_medium"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -27,7 +27,7 @@
             android:id="@+id/txtRachaName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="@dimen/section_text_size"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -42,15 +42,16 @@
             android:id="@+id/txtRachaDays"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="@dimen/body_text_size"
             android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/imgFire"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_marginStart="@dimen/spacing_small"
             android:contentDescription="@string/fire_icon"
+            android:padding="@dimen/spacing_regular"
             android:src="@drawable/ic_fire_inactive" />
 
     </LinearLayout>

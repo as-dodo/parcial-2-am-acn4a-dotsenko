@@ -9,74 +9,75 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="@dimen/spacing_xlarge">
 
         <TextView
             android:id="@+id/txtDetailTitle"
+            android:accessibilityHeading="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/detail_title"
             android:textColor="@color/purple_main"
-            android:textSize="24sp"
+            android:textSize="@dimen/large_text_size"
             android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/detailCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="@dimen/spacing_xxlarge"
             android:background="@drawable/detail_card_bg"
-            android:elevation="4dp"
+            android:elevation="@dimen/elevation_medium"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="28dp">
+            android:padding="@dimen/spacing_28">
 
             <TextView
                 android:id="@+id/txtDetailIcono"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/default_racha_icon"
-                android:textSize="56sp" />
+                android:textSize="@dimen/detail_icon_text_size" />
 
             <TextView
                 android:id="@+id/txtDetailNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_large"
                 android:gravity="center"
                 android:textColor="@color/purple_main"
-                android:textSize="28sp"
+                android:textSize="@dimen/title_text_size"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txtDetailDias"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/spacing_medium"
                 android:gravity="center"
                 android:textColor="@color/gray_dark"
-                android:textSize="18sp"
+                android:textSize="@dimen/section_text_size"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txtDetailEstado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/spacing_medium"
                 android:gravity="center"
                 android:textColor="@color/gray_dark"
-                android:textSize="16sp" />
+                android:textSize="@dimen/body_text_size" />
 
             <TextView
                 android:id="@+id/txtDetailDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="@dimen/spacing_xlarge"
                 android:gravity="center"
-                android:lineSpacingExtra="4dp"
+                android:lineSpacingExtra="@dimen/spacing_xsmall"
                 android:textColor="@color/gray_dark"
-                android:textSize="16sp" />
+                android:textSize="@dimen/body_text_size" />
 
         </LinearLayout>
 
@@ -84,26 +85,26 @@
             android:id="@+id/txtSameRachaTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="@dimen/spacing_28"
             android:text="@string/detail_same_racha_title"
             android:textColor="@color/purple_main"
-            android:textSize="18sp"
+            android:textSize="@dimen/section_text_size"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtSameRachaSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="@dimen/spacing_compact"
             android:text="@string/detail_same_racha_subtitle"
             android:textColor="@color/gray_dark"
-            android:textSize="14sp" />
+            android:textSize="@dimen/small_text_size" />
 
         <LinearLayout
             android:id="@+id/sameRachaUsersContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:orientation="vertical" />
 
         <Button
@@ -111,9 +112,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_xlarge"
             android:backgroundTint="@color/pink"
-            android:minWidth="160dp"
+            android:minWidth="@dimen/detail_button_min_width"
             android:text="@string/detail_delete_racha"
             android:textColor="@color/white" />
 
@@ -122,8 +123,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp"
-            android:minWidth="160dp"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:minWidth="@dimen/detail_button_min_width"
             android:text="@string/detail_back" />
     </LinearLayout>
 </ScrollView>

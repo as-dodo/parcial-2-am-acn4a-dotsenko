@@ -140,6 +140,8 @@
     <string name="racha_catalog_add_failed">La racha se agregó, pero no se pudo guardar en el catálogo.</string>
     <string name="racha_already_completed_today">Esta racha ya fue completada hoy.</string>
     <string name="racha_completed_today_success">¡Racha completada hoy!</string>
+    <string name="racha_mark_complete_accessibility">Marcar %1$s como completada</string>
+    <string name="racha_completed_accessibility">%1$s ya está completada hoy</string>
     <string name="racha_load_failed">No se pudieron cargar las rachas.</string>
     <string name="racha_save_failed">No se pudo guardar la racha.</string>
     <string name="racha_update_failed">No se pudo actualizar la racha.</string>

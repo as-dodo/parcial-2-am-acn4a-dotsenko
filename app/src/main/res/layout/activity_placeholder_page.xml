@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/screen_bg"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="@dimen/spacing_xlarge">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,32 +16,33 @@
 
         <TextView
             android:id="@+id/txtPageTitle"
+            android:accessibilityHeading="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/purple_main"
-            android:textSize="28sp"
+            android:textSize="@dimen/title_text_size"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtPageSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:gravity="center"
             android:textColor="@color/gray_dark"
-            android:textSize="16sp" />
+            android:textSize="@dimen/body_text_size" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="@dimen/spacing_small">
 
         <LinearLayout
             android:id="@+id/menuInicio"
@@ -55,6 +56,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/home"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -78,6 +81,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/calendar"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -101,6 +106,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/friends"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
@@ -124,6 +131,8 @@
                 android:layout_width="@dimen/menu_icon_width"
                 android:layout_height="@dimen/menu_icon_height"
                 android:src="@drawable/profile"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
                 app:tint="@color/gray_dark" />
 
             <TextView
