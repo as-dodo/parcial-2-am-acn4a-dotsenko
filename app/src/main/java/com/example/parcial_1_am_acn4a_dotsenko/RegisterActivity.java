@@ -88,12 +88,13 @@ public class RegisterActivity extends AppCompatActivity {
                         currentUser.updateProfile(profileUpdates);
 
                         db.collection("users")
-                                .document(userId)
-                                .set(userData)
-                                .addOnSuccessListener(unused -> {
-                                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
+                        .document(userId)
+                        .set(userData)
+                        .addOnSuccessListener(unused -> {
+                            Toast.makeText(this, R.string.register_success, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
                                 })
                                 .addOnFailureListener(e -> {
                                     btnCreateAccount.setEnabled(true);

@@ -143,9 +143,12 @@
     <string name="profile_no_rachas">Sin rachas</string>
     <string name="login_error_fill_fields">Por favor ingresa email y contraseña.</string>
     <string name="login_error_failed">No se pudo iniciar sesión.</string>
+    <string name="login_success">Sesión iniciada correctamente.</string>
     <string name="register_error_fill_fields">Por favor completa todos los campos.</string>
     <string name="register_error_save_profile">No se pudo guardar el perfil.</string>
     <string name="register_error_create_account">No se pudo crear la cuenta.</string>
+    <string name="register_success">Cuenta creada correctamente.</string>
+    <string name="logout_success">Sesión cerrada correctamente.</string>
     <string name="login_title">Iniciar Sesión</string>
     <string name="register_title">Crear cuenta</string>
     <string name="hint_email">Email</string>

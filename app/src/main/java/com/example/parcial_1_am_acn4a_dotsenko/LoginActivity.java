@@ -43,11 +43,12 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } else {
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    } else {
                             Toast.makeText(this, R.string.login_error_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
