@@ -75,8 +75,26 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@color/gray_dark"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txtUserPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/gray_dark"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnEditProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/blue"
+            android:text="@string/btn_edit_profile"
+            android:textColor="@color/white" />
 
         <View
             android:layout_width="match_parent"
