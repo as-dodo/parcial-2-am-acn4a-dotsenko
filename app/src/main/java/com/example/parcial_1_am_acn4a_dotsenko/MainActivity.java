@@ -101,6 +101,14 @@ public class MainActivity extends AppCompatActivity {
         cargarRachas();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (currentUserId != null && rachaContainer != null) {
+            cargarRachas();
+        }
+    }
+
     private void cargarPerfilUsuario(String userId, String email) {
         db.collection(COLLECTION_USERS)
                 .document(userId)
@@ -320,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
 
             card.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity.this, RachaDetailActivity.class);
+                intent.putExtra(RachaDetailActivity.EXTRA_RACHA_ID, racha.id);
                 intent.putExtra(RachaDetailActivity.EXTRA_NOMBRE, racha.nombre);
                 intent.putExtra(RachaDetailActivity.EXTRA_ICONO, racha.icono);
                 intent.putExtra(RachaDetailActivity.EXTRA_DIAS, racha.dias);

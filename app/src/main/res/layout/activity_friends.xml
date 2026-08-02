@@ -36,11 +36,25 @@
                 android:textColor="@color/gray_dark"
                 android:textSize="16sp" />
 
+            <EditText
+                android:id="@+id/inputSearchFriends"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/light_card_bg"
+                android:hint="@string/search_friends_hint"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray_light"
+                android:textSize="14sp" />
+
             <TextView
                 android:id="@+id/txtFriendsHint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/light_card_bg"
                 android:padding="16dp"
                 android:text="@string/friends_hint"

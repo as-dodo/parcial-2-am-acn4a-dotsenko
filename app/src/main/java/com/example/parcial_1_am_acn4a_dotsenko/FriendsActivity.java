@@ -1,12 +1,17 @@
 package com.example.parcial_1_am_acn4a_dotsenko;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,7 +26,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -40,7 +47,10 @@ public class FriendsActivity extends AppCompatActivity {
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout friendsContainer;
+    private EditText inputSearchFriends;
     private FirebaseFirestore db;
+    private String currentUserId;
+    private final List<FriendItem> allFriends = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +58,7 @@ public class FriendsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_friends);
 
         friendsContainer = findViewById(R.id.friendsContainer);
+        inputSearchFriends = findViewById(R.id.inputSearchFriends);
         db = FirebaseFirestore.getInstance();
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -57,35 +68,81 @@ public class FriendsActivity extends AppCompatActivity {
             return;
         }
 
+        currentUserId = currentUser.getUid();
+
+        inputSearchFriends.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mostrarAmigosFiltrados();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         BottomNavigationHelper.setup(this, R.id.menuAmigos);
-        cargarAmigos(currentUser.getUid());
+        cargarAmigos();
     }
 
-    private void cargarAmigos(String userId) {
+    private void cargarAmigos() {
         friendsContainer.removeAllViews();
         addInfoRow(getString(R.string.friends_loading));
 
         db.collection(COLLECTION_USERS)
-                .document(userId)
+                .document(currentUserId)
                 .collection(COLLECTION_FRIENDS)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    friendsContainer.removeAllViews();
-
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        addInfoRow(getString(R.string.friends_empty));
-                        return;
-                    }
+                    allFriends.clear();
 
                     for (DocumentSnapshot friendDocument : queryDocumentSnapshots.getDocuments()) {
-                        addFriendRow(friendDocument);
+                        allFriends.add(FriendItem.fromDocument(friendDocument, this));
                     }
+
+                    mostrarAmigosFiltrados();
                 })
                 .addOnFailureListener(e -> {
+                    allFriends.clear();
                     friendsContainer.removeAllViews();
                     addInfoRow(getString(R.string.friends_load_error));
                     Toast.makeText(this, R.string.friends_load_error, Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void mostrarAmigosFiltrados() {
+        friendsContainer.removeAllViews();
+
+        String query = inputSearchFriends.getText() != null
+                ? inputSearchFriends.getText().toString().trim().toLowerCase(Locale.ROOT)
+                : "";
+
+        List<FriendItem> filtered = new ArrayList<>();
+        for (FriendItem friend : allFriends) {
+            if (query.isEmpty()
+                    || friend.fullName.toLowerCase(Locale.ROOT).contains(query)
+                    || friend.email.toLowerCase(Locale.ROOT).contains(query)) {
+                filtered.add(friend);
+            }
+        }
+
+        if (allFriends.isEmpty()) {
+            addInfoRow(getString(R.string.friends_empty));
+            return;
+        }
+
+        if (filtered.isEmpty()) {
+            addInfoRow(getString(R.string.friends_empty_search));
+            return;
+        }
+
+        for (FriendItem friend : filtered) {
+            addFriendRow(friend);
+        }
     }
 
     private void addInfoRow(String text) {
@@ -102,20 +159,7 @@ public class FriendsActivity extends AppCompatActivity {
         friendsContainer.addView(textView);
     }
 
-    private void addFriendRow(DocumentSnapshot friendDocument) {
-        String fullName = friendDocument.getString(FIELD_FULL_NAME);
-        String email = friendDocument.getString(FIELD_EMAIL);
-        String photoUrl = friendDocument.getString(FIELD_PHOTO_URL);
-        Map<String, SharedRacha> selectedRachas = getSelectedRachas(friendDocument);
-
-        if (fullName == null || fullName.trim().isEmpty()) {
-            fullName = getString(R.string.detail_unknown_user);
-        }
-
-        if (email == null) {
-            email = "";
-        }
-
+    private void addFriendRow(FriendItem friend) {
         LinearLayout card = new LinearLayout(this);
         LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -134,7 +178,7 @@ public class FriendsActivity extends AppCompatActivity {
         ImageView avatar = new ImageView(this);
         avatar.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
         avatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        cargarAvatar(avatar, photoUrl, fullName, email);
+        cargarAvatar(avatar, friend.photoUrl, friend.fullName, friend.email);
         row.addView(avatar);
 
         LinearLayout texts = new LinearLayout(this);
@@ -148,19 +192,25 @@ public class FriendsActivity extends AppCompatActivity {
         texts.setOrientation(LinearLayout.VERTICAL);
 
         TextView txtName = new TextView(this);
-        txtName.setText(fullName);
+        txtName.setText(friend.fullName);
         txtName.setTextColor(ContextCompat.getColor(this, R.color.black));
         txtName.setTextSize(16f);
         txtName.setTypeface(null, Typeface.BOLD);
         texts.addView(txtName);
 
         TextView txtEmail = new TextView(this);
-        txtEmail.setText(email);
+        txtEmail.setText(friend.email);
         txtEmail.setTextColor(ContextCompat.getColor(this, R.color.gray_dark));
         txtEmail.setTextSize(13f);
         texts.addView(txtEmail);
 
         row.addView(texts);
+
+        Button btnRemove = new Button(this);
+        btnRemove.setText(R.string.friends_remove);
+        btnRemove.setOnClickListener(v -> confirmarEliminarAmigo(friend));
+        row.addView(btnRemove);
+
         card.addView(row);
 
         TextView txtCommonTitle = new TextView(this);
@@ -179,15 +229,39 @@ public class FriendsActivity extends AppCompatActivity {
         commonContainer.setOrientation(LinearLayout.VERTICAL);
         card.addView(commonContainer);
 
-        if (selectedRachas.isEmpty()) {
+        if (friend.selectedRachas.isEmpty()) {
             addCommonInfoRow(commonContainer, getString(R.string.friends_common_rachas_empty));
         } else {
-            for (SharedRacha racha : selectedRachas.values()) {
+            for (SharedRacha racha : friend.selectedRachas.values()) {
                 addCommonRachaRow(commonContainer, racha.nombre, racha.icono, racha.days);
             }
         }
 
         friendsContainer.addView(card);
+    }
+
+    private void confirmarEliminarAmigo(FriendItem friend) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.friends_remove_title)
+                .setMessage(getString(R.string.friends_remove_message, friend.fullName))
+                .setPositiveButton(R.string.friends_remove_confirm, (dialog, which) -> eliminarAmigo(friend))
+                .setNegativeButton(R.string.friends_remove_cancel, null)
+                .show();
+    }
+
+    private void eliminarAmigo(FriendItem friend) {
+        db.collection(COLLECTION_USERS)
+                .document(currentUserId)
+                .collection(COLLECTION_FRIENDS)
+                .document(friend.id)
+                .delete()
+                .addOnSuccessListener(unused -> {
+                    allFriends.remove(friend);
+                    mostrarAmigosFiltrados();
+                    Toast.makeText(this, R.string.friends_remove_success, Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, R.string.friends_remove_error, Toast.LENGTH_SHORT).show());
     }
 
     private void addCommonInfoRow(LinearLayout container, String text) {
@@ -223,6 +297,80 @@ public class FriendsActivity extends AppCompatActivity {
         row.addView(txtDays);
 
         container.addView(row);
+    }
+
+    private void cargarAvatar(ImageView avatar, String photoUrl, String fullName, String email) {
+        String imageUrl = !TextUtils.isEmpty(photoUrl)
+                ? photoUrl
+                : buildAvatarUrl(!TextUtils.isEmpty(fullName) ? fullName : email);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .circleCrop()
+                .into(avatar);
+    }
+
+    private String buildAvatarUrl(String fallbackText) {
+        String seed = !TextUtils.isEmpty(fallbackText) ? fallbackText : getString(R.string.detail_unknown_user);
+
+        return Uri.parse(AVATAR_API_URL)
+                .buildUpon()
+                .appendQueryParameter("name", seed)
+                .appendQueryParameter("background", "7E57C2")
+                .appendQueryParameter("color", "FFFFFF")
+                .appendQueryParameter("size", "256")
+                .build()
+                .toString();
+    }
+
+    private int dp(int value) {
+        return (int) (value * getResources().getDisplayMetrics().density);
+    }
+
+    private static class FriendItem {
+        final String id;
+        final String fullName;
+        final String email;
+        final String photoUrl;
+        final Map<String, SharedRacha> selectedRachas;
+
+        FriendItem(
+                String id,
+                String fullName,
+                String email,
+                String photoUrl,
+                Map<String, SharedRacha> selectedRachas
+        ) {
+            this.id = id;
+            this.fullName = fullName;
+            this.email = email;
+            this.photoUrl = photoUrl;
+            this.selectedRachas = selectedRachas;
+        }
+
+        static FriendItem fromDocument(DocumentSnapshot friendDocument, FriendsActivity activity) {
+            String fullName = friendDocument.getString(FIELD_FULL_NAME);
+            String email = friendDocument.getString(FIELD_EMAIL);
+            String photoUrl = friendDocument.getString(FIELD_PHOTO_URL);
+
+            if (fullName == null || fullName.trim().isEmpty()) {
+                fullName = activity.getString(R.string.detail_unknown_user);
+            }
+
+            if (email == null) {
+                email = "";
+            }
+
+            return new FriendItem(
+                    friendDocument.getId(),
+                    fullName,
+                    email,
+                    photoUrl,
+                    activity.getSelectedRachas(friendDocument)
+            );
+        }
     }
 
     private Map<String, SharedRacha> getSelectedRachas(DocumentSnapshot friendDocument) {
@@ -319,36 +467,6 @@ public class FriendsActivity extends AppCompatActivity {
         }
 
         return value.trim().toLowerCase(Locale.ROOT);
-    }
-
-    private void cargarAvatar(ImageView avatar, String photoUrl, String fullName, String email) {
-        String imageUrl = !TextUtils.isEmpty(photoUrl)
-                ? photoUrl
-                : buildAvatarUrl(!TextUtils.isEmpty(fullName) ? fullName : email);
-
-        Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.profile)
-                .error(R.drawable.profile)
-                .circleCrop()
-                .into(avatar);
-    }
-
-    private String buildAvatarUrl(String fallbackText) {
-        String seed = !TextUtils.isEmpty(fallbackText) ? fallbackText : getString(R.string.detail_unknown_user);
-
-        return Uri.parse(AVATAR_API_URL)
-                .buildUpon()
-                .appendQueryParameter("name", seed)
-                .appendQueryParameter("background", "7E57C2")
-                .appendQueryParameter("color", "FFFFFF")
-                .appendQueryParameter("size", "256")
-                .build()
-                .toString();
-    }
-
-    private int dp(int value) {
-        return (int) (value * getResources().getDisplayMetrics().density);
     }
 
     private static class SharedRacha {

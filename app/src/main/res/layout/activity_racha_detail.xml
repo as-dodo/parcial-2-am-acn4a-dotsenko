@@ -107,11 +107,22 @@
             android:orientation="vertical" />
 
         <Button
-            android:id="@+id/btnDetailVolver"
+            android:id="@+id/btnDetailDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
+            android:backgroundTint="@color/pink"
+            android:minWidth="160dp"
+            android:text="@string/detail_delete_racha"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btnDetailVolver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
             android:minWidth="160dp"
             android:text="@string/detail_back" />
     </LinearLayout>

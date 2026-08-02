@@ -1,5 +1,6 @@
 package com.example.parcial_1_am_acn4a_dotsenko;
 
+import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -35,9 +37,11 @@ public class RachaDetailActivity extends AppCompatActivity {
     public static final String EXTRA_ICONO = "icono";
     public static final String EXTRA_DIAS = "dias";
     public static final String EXTRA_COMPLETADA_HOY = "completadaHoy";
+    public static final String EXTRA_RACHA_ID = "rachaId";
 
     private static final String COLLECTION_USERS = "users";
     private static final String COLLECTION_RACHAS = "rachas";
+    private static final String COLLECTION_COMPLETIONS = "completions";
     private static final String COLLECTION_FRIENDS = "friends";
     private static final String FIELD_NOMBRE_KEY = "nombreKey";
     private static final String FIELD_DIAS = "dias";
@@ -56,6 +60,7 @@ public class RachaDetailActivity extends AppCompatActivity {
     private LinearLayout sameRachaUsersContainer;
     private FirebaseFirestore db;
     private String currentUserId;
+    private String rachaId;
     private String nombre;
     private String nombreKey;
     private String icono;
@@ -76,9 +81,11 @@ public class RachaDetailActivity extends AppCompatActivity {
         TextView txtDias = findViewById(R.id.txtDetailDias);
         TextView txtEstado = findViewById(R.id.txtDetailEstado);
         TextView txtDescripcion = findViewById(R.id.txtDetailDescripcion);
+        Button btnDelete = findViewById(R.id.btnDetailDelete);
         Button btnVolver = findViewById(R.id.btnDetailVolver);
         sameRachaUsersContainer = findViewById(R.id.sameRachaUsersContainer);
 
+        rachaId = getIntent().getStringExtra(EXTRA_RACHA_ID);
         nombre = getIntent().getStringExtra(EXTRA_NOMBRE);
         nombreKey = getIntent().getStringExtra(EXTRA_NOMBRE_KEY);
         icono = getIntent().getStringExtra(EXTRA_ICONO);
@@ -111,9 +118,51 @@ public class RachaDetailActivity extends AppCompatActivity {
         txtEstado.setText(getString(R.string.detail_status_format, estado));
         txtDescripcion.setText(descripcion);
 
+        btnDelete.setOnClickListener(v -> confirmarEliminarRacha());
         btnVolver.setOnClickListener(v -> finish());
 
         cargarUsuariosConMismaRacha();
+    }
+
+    private void confirmarEliminarRacha() {
+        if (TextUtils.isEmpty(rachaId) || TextUtils.isEmpty(currentUserId)) {
+            Toast.makeText(this, R.string.detail_delete_racha_missing_id, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.detail_delete_racha_title)
+                .setMessage(getString(R.string.detail_delete_racha_message, nombre))
+                .setPositiveButton(R.string.detail_delete_racha_confirm, (dialog, which) -> eliminarRacha())
+                .setNegativeButton(R.string.detail_delete_racha_cancel, null)
+                .show();
+    }
+
+    private void eliminarRacha() {
+        DocumentReference rachaReference = db.collection(COLLECTION_USERS)
+                .document(currentUserId)
+                .collection(COLLECTION_RACHAS)
+                .document(rachaId);
+
+        rachaReference.collection(COLLECTION_COMPLETIONS)
+                .get()
+                .addOnSuccessListener(completionSnapshots -> {
+                    WriteBatch batch = db.batch();
+                    for (DocumentSnapshot completionDocument : completionSnapshots.getDocuments()) {
+                        batch.delete(completionDocument.getReference());
+                    }
+                    batch.delete(rachaReference);
+
+                    batch.commit()
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(this, R.string.detail_delete_racha_success, Toast.LENGTH_SHORT).show();
+                                finish();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(this, R.string.detail_delete_racha_error, Toast.LENGTH_SHORT).show());
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, R.string.detail_delete_racha_error, Toast.LENGTH_SHORT).show());
     }
 
     private void cargarUsuariosConMismaRacha() {
