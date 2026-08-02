@@ -9,7 +9,7 @@ Cada usuario puede crear una cuenta, iniciar sesión, ver sus rachas, marcar las
 - Registro e inicio de sesión con Firebase Authentication (email y contraseña).
 - Perfil de usuario en Cloud Firestore (nombre, teléfono, email, foto).
 - Edición de perfil (nombre y teléfono) con actualización en Firestore.
-- Rachas por usuario en Firestore, con seed inicial para cuentas nuevas.
+- Rachas por usuario en Firestore; las cuentas nuevas comienzan con una lista vacía.
 - Creación, marcado diario y eliminación de rachas.
 - Historial de completions por día (`users/{uid}/rachas/{id}/completions/{yyyy-MM-dd}`).
 - Calendario con datos reales del mes, colores según progreso y detalle por día.
@@ -36,7 +36,7 @@ Cada usuario puede crear una cuenta, iniciar sesión, ver sus rachas, marcar las
 ## Flujo de uso
 
 1. Registrarse o iniciar sesión.
-2. En **Inicio**, ver rachas, marcar el día con 🔥 o crear una nueva.
+2. En **Inicio**, crear la primera racha si la lista está vacía, ver las existentes y marcar el día con 🔥.
 3. Abrir una racha para ver detalle, agregar amigos o eliminarla.
 4. En **Calendario**, ver el mes y tocá un día para ver qué se completó.
 5. En **Amigos**, buscar y gestionar la lista.

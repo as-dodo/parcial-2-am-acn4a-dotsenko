@@ -63,7 +63,7 @@ Usuario completa email/password → Iniciar sesión → Inicio.
 - Toast ante errores.
 
 **Flujo**
-Completar formulario → Crear cuenta → Inicio (con rachas iniciales si corresponde).
+Completar formulario → Crear cuenta → Inicio. La cuenta nueva comienza sin rachas y la pantalla invita a crear la primera.
 
 ---
 
@@ -72,6 +72,7 @@ Completar formulario → Crear cuenta → Inicio (con rachas iniciales si corres
 **Funcionalidades**
 - Saludo con nombre y avatar.
 - Lista de rachas del usuario.
+- Estado vacío con acceso a "Nueva racha" cuando el usuario todavía no agregó ninguna.
 - Contador de rachas completadas hoy.
 - Marcar racha del día (🔥) → actualiza `dias`, `lastCompletedDate` y escribe en `completions`.
 - Crear nueva racha (diálogo).
@@ -79,7 +80,7 @@ Completar formulario → Crear cuenta → Inicio (con rachas iniciales si corres
 - Al volver desde Detalle, recarga la lista.
 
 **Flujo**
-Ver rachas → marcar día / crear racha / abrir detalle.
+Si la lista está vacía, crear la primera racha → marcar el día / crear más rachas / abrir detalle.
 
 ---
 

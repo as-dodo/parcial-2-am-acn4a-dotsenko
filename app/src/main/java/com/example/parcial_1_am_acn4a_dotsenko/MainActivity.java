@@ -23,7 +23,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
@@ -35,7 +34,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String FIELD_DATE = "date";
     private static final String FIELD_COMPLETED_AT = "completedAt";
-    private static final String FIELD_RACHAS_SEEDED = "rachasSeeded";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
-    /** Cap days so create + completions stay under Firestore's 500 writes/batch. */
-    private static final int MAX_RACHA_DIAS = 365;
 
     private LinearLayout rachaContainer;
     private TextView txtCompletedToday;
@@ -68,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String currentUserId;
     private boolean isLoadingRachas;
-    private boolean isSeedingRachas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarRachas() {
-        if (isLoadingRachas || isSeedingRachas) {
+        if (isLoadingRachas) {
             return;
         }
 
@@ -175,11 +169,6 @@ public class MainActivity extends AppCompatActivity {
         getRachasReference()
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        resolverListaVacia();
-                        return;
-                    }
-
                     rachas.clear();
                     for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
                         Racha racha = Racha.fromDocument(documentSnapshot);
@@ -189,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
 
                     ordenarRachas();
                     mostrarRachas();
-                    marcarRachasSeeded();
                     isLoadingRachas = false;
                 })
                 .addOnFailureListener(e -> {
@@ -198,99 +186,6 @@ public class MainActivity extends AppCompatActivity {
                     mostrarRachas();
                     Toast.makeText(this, R.string.racha_load_failed, Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    /**
-     * Seeds only once per user. If the list is empty after a previous seed
-     * (user deleted every racha), keep the empty list — do not recreate defaults.
-     */
-    private void resolverListaVacia() {
-        db.collection(COLLECTION_USERS)
-                .document(currentUserId)
-                .get()
-                .addOnSuccessListener(userDocument -> {
-                    boolean alreadySeeded = Boolean.TRUE.equals(
-                            userDocument.getBoolean(FIELD_RACHAS_SEEDED)
-                    );
-                    if (alreadySeeded) {
-                        rachas.clear();
-                        mostrarRachas();
-                        isLoadingRachas = false;
-                        return;
-                    }
-
-                    crearRachasIniciales();
-                })
-                .addOnFailureListener(e -> {
-                    isLoadingRachas = false;
-                    rachas.clear();
-                    mostrarRachas();
-                    Toast.makeText(this, R.string.racha_load_failed, Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void crearRachasIniciales() {
-        if (isSeedingRachas) {
-            isLoadingRachas = false;
-            return;
-        }
-
-        isSeedingRachas = true;
-        String today = getTodayDateKey();
-        String yesterday = getYesterdayDateKey();
-        Random random = new Random();
-
-        Racha[] initialRachas = new Racha[] {
-                new Racha(null, getString(R.string.seed_racha_yoga), "🧘", randomDays(random), today),
-                new Racha(null, getString(R.string.seed_racha_english), "🇬🇧", randomDays(random), yesterday),
-                new Racha(null, getString(R.string.seed_racha_spanish), "🇪🇸", randomDays(random), today),
-                new Racha(null, getString(R.string.seed_racha_running), "🏃", randomDays(random), yesterday),
-                new Racha(null, getString(R.string.seed_racha_no_smoking), "🚭", randomDays(random), today)
-        };
-
-        WriteBatch batch = db.batch();
-        CollectionReference rachasReference = getRachasReference();
-
-        for (Racha racha : initialRachas) {
-            DocumentReference rachaReference = rachasReference.document();
-            racha.id = rachaReference.getId();
-            batch.set(rachaReference, racha.toMap(currentUserId, true));
-            agregarHistorialCompletionsAlBatch(batch, rachaReference, racha);
-        }
-
-        Map<String, Object> seedFlag = new HashMap<>();
-        seedFlag.put(FIELD_RACHAS_SEEDED, true);
-        seedFlag.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
-        batch.set(
-                db.collection(COLLECTION_USERS).document(currentUserId),
-                seedFlag,
-                SetOptions.merge()
-        );
-
-        batch.commit()
-                .addOnSuccessListener(unused -> {
-                    isSeedingRachas = false;
-                    isLoadingRachas = false;
-                    cargarRachas();
-                })
-                .addOnFailureListener(e -> {
-                    isSeedingRachas = false;
-                    isLoadingRachas = false;
-                    Toast.makeText(this, R.string.racha_seed_failed, Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void marcarRachasSeeded() {
-        Map<String, Object> seedFlag = new HashMap<>();
-        seedFlag.put(FIELD_RACHAS_SEEDED, true);
-        seedFlag.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
-        db.collection(COLLECTION_USERS)
-                .document(currentUserId)
-                .set(seedFlag, SetOptions.merge());
-    }
-
-    private int randomDays(Random random) {
-        return random.nextInt(14) + 1;
     }
 
     private void mostrarDialogNuevaRacha() {
@@ -298,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
         EditText inputNombre = dialogView.findViewById(R.id.inputRachaNombre);
         EditText inputIcono = dialogView.findViewById(R.id.inputRachaIcono);
-        EditText inputDias = dialogView.findViewById(R.id.inputRachaDias);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_new_racha_title)
@@ -312,26 +206,9 @@ public class MainActivity extends AppCompatActivity {
             positiveButton.setOnClickListener(v -> {
                 String nombre = inputNombre.getText().toString().trim();
                 String icono = inputIcono.getText().toString().trim();
-                String diasText = inputDias.getText().toString().trim();
 
                 if (TextUtils.isEmpty(nombre)) {
                     inputNombre.setError(getString(R.string.dialog_new_racha_name_required));
-                    return;
-                }
-
-                int dias = 0;
-
-                if (!TextUtils.isEmpty(diasText)) {
-                    try {
-                        dias = Integer.parseInt(diasText);
-                    } catch (NumberFormatException ex) {
-                        inputDias.setError(getString(R.string.dialog_new_racha_invalid_days));
-                        return;
-                    }
-                }
-
-                if (dias < 0 || dias > MAX_RACHA_DIAS) {
-                    inputDias.setError(getString(R.string.dialog_new_racha_days_too_large, MAX_RACHA_DIAS));
                     return;
                 }
 
@@ -340,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 positiveButton.setEnabled(false);
-                guardarNuevaRacha(icono, nombre, dias, dialog, positiveButton);
+                guardarNuevaRacha(icono, nombre, dialog, positiveButton);
             });
         });
 
@@ -350,19 +227,13 @@ public class MainActivity extends AppCompatActivity {
     private void guardarNuevaRacha(
             String icono,
             String nombre,
-            int dias,
             AlertDialog dialog,
             Button positiveButton
     ) {
         DocumentReference rachaReference = getRachasReference().document();
-        String lastCompletedDate = dias > 0 ? getYesterdayDateKey() : null;
-        Racha racha = new Racha(rachaReference.getId(), nombre, icono, dias, lastCompletedDate);
+        Racha racha = new Racha(rachaReference.getId(), nombre, icono, 0, null);
 
-        WriteBatch batch = db.batch();
-        batch.set(rachaReference, racha.toMap(currentUserId, true));
-        agregarHistorialCompletionsAlBatch(batch, rachaReference, racha);
-
-        batch.commit()
+        rachaReference.set(racha.toMap(currentUserId, true))
                 .addOnSuccessListener(unused -> {
                     rachas.add(racha);
                     ordenarRachas();
@@ -378,6 +249,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void mostrarRachas() {
         rachaContainer.removeAllViews();
+
+        if (rachas.isEmpty()) {
+            View emptyState = getLayoutInflater().inflate(
+                    R.layout.item_empty_rachas,
+                    rachaContainer,
+                    false
+            );
+            emptyState.setOnClickListener(v -> mostrarDialogNuevaRacha());
+            rachaContainer.addView(emptyState);
+            actualizarResumenDelDia();
+            return;
+        }
 
         for (Racha racha : rachas) {
             View card = getLayoutInflater().inflate(R.layout.item_racha, rachaContainer, false);
@@ -453,34 +336,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Writes completion history for the last {@code dias} days ending at {@code lastCompletedDate}.
-     * Keeps seed/new rachas consistent with the day counter for the calendar screen.
-     */
-    private void agregarHistorialCompletionsAlBatch(
-            WriteBatch batch,
-            DocumentReference rachaReference,
-            Racha racha
-    ) {
-        if (racha.dias <= 0 || TextUtils.isEmpty(racha.lastCompletedDate)) {
-            return;
-        }
-
-        Calendar calendar = parseDateKey(racha.lastCompletedDate);
-        if (calendar == null) {
-            return;
-        }
-
-        for (int i = 0; i < racha.dias; i++) {
-            String dateKey = formatDateKey(calendar);
-            batch.set(
-                    rachaReference.collection(COLLECTION_COMPLETIONS).document(dateKey),
-                    buildCompletionMap(dateKey, racha.nombre, racha.icono)
-            );
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-        }
-    }
-
     private Map<String, Object> buildCompletionMap(String dateKey, String nombre, String icono) {
         Map<String, Object> completion = new HashMap<>();
         completion.put(FIELD_DATE, dateKey);
@@ -488,22 +343,6 @@ public class MainActivity extends AppCompatActivity {
         completion.put(FIELD_ICONO, icono);
         completion.put(FIELD_COMPLETED_AT, FieldValue.serverTimestamp());
         return completion;
-    }
-
-    private Calendar parseDateKey(String dateKey) {
-        try {
-            SimpleDateFormat storageDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            Date date = storageDateFormat.parse(dateKey);
-            if (date == null) {
-                return null;
-            }
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            return calendar;
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     private void ordenarRachas() {

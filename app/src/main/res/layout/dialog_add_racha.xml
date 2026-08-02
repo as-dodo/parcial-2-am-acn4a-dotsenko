@@ -35,13 +35,4 @@
         android:maxLength="4"
         android:maxLines="1" />
 
-    <EditText
-        android:id="@+id/inputRachaDias"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="@string/dialog_new_racha_days_hint"
-        android:inputType="number"
-        android:maxLines="1" />
-
 </LinearLayout>
