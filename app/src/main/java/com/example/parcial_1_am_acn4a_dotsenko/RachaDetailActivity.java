@@ -26,7 +26,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -56,6 +58,8 @@ public class RachaDetailActivity extends AppCompatActivity {
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
+    /** Leave headroom under Firestore's 500 writes/batch limit. */
+    private static final int FIRESTORE_BATCH_LIMIT = 450;
 
     private LinearLayout sameRachaUsersContainer;
     private FirebaseFirestore db;
@@ -147,19 +151,39 @@ public class RachaDetailActivity extends AppCompatActivity {
         rachaReference.collection(COLLECTION_COMPLETIONS)
                 .get()
                 .addOnSuccessListener(completionSnapshots -> {
-                    WriteBatch batch = db.batch();
-                    for (DocumentSnapshot completionDocument : completionSnapshots.getDocuments()) {
-                        batch.delete(completionDocument.getReference());
-                    }
-                    batch.delete(rachaReference);
+                    List<DocumentSnapshot> completionDocuments =
+                            new ArrayList<>(completionSnapshots.getDocuments());
+                    eliminarEnLotes(rachaReference, completionDocuments, 0);
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, R.string.detail_delete_racha_error, Toast.LENGTH_SHORT).show());
+    }
 
-                    batch.commit()
-                            .addOnSuccessListener(unused -> {
-                                Toast.makeText(this, R.string.detail_delete_racha_success, Toast.LENGTH_SHORT).show();
-                                finish();
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(this, R.string.detail_delete_racha_error, Toast.LENGTH_SHORT).show());
+    private void eliminarEnLotes(
+            DocumentReference rachaReference,
+            List<DocumentSnapshot> completionDocuments,
+            int startIndex
+    ) {
+        WriteBatch batch = db.batch();
+        int endIndex = Math.min(startIndex + FIRESTORE_BATCH_LIMIT, completionDocuments.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            batch.delete(completionDocuments.get(i).getReference());
+        }
+
+        boolean isLastBatch = endIndex >= completionDocuments.size();
+        if (isLastBatch) {
+            batch.delete(rachaReference);
+        }
+
+        batch.commit()
+                .addOnSuccessListener(unused -> {
+                    if (isLastBatch) {
+                        Toast.makeText(this, R.string.detail_delete_racha_success, Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        eliminarEnLotes(rachaReference, completionDocuments, endIndex);
+                    }
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, R.string.detail_delete_racha_error, Toast.LENGTH_SHORT).show());

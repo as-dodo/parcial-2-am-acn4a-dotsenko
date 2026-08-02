@@ -21,6 +21,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -259,7 +260,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         db.collection(COLLECTION_USERS)
                 .document(currentUserId)
-                .update(updates)
+                .set(updates, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
                     currentFullName = fullName;
                     currentPhoneNumber = phoneNumber;

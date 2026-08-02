@@ -124,8 +124,10 @@
     <string name="dialog_new_racha_cancel">Cancelar</string>
     <string name="dialog_new_racha_name_required">Ingresá el nombre de la racha.</string>
     <string name="dialog_new_racha_invalid_days">Los días deben ser un número válido.</string>
+    <string name="dialog_new_racha_days_too_large">Los días no pueden superar %1$d.</string>
     <string name="dialog_new_racha_added">Racha agregada.</string>
     <string name="racha_already_completed_today">Esta racha ya fue completada hoy.</string>
+    <string name="racha_completed_today_success">¡Racha completada hoy!</string>
     <string name="racha_load_failed">No se pudieron cargar las rachas.</string>
     <string name="racha_seed_failed">No se pudieron crear las rachas iniciales.</string>
     <string name="racha_save_failed">No se pudo guardar la racha.</string>

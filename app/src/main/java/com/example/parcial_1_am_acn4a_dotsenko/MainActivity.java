@@ -23,6 +23,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
@@ -53,7 +54,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String FIELD_DATE = "date";
     private static final String FIELD_COMPLETED_AT = "completedAt";
+    private static final String FIELD_RACHAS_SEEDED = "rachasSeeded";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
+    /** Cap days so create + completions stay under Firestore's 500 writes/batch. */
+    private static final int MAX_RACHA_DIAS = 365;
 
     private LinearLayout rachaContainer;
     private TextView txtCompletedToday;
@@ -63,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private String currentUserId;
+    private boolean isLoadingRachas;
+    private boolean isSeedingRachas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
         btnNuevaRacha.setOnClickListener(v -> mostrarDialogNuevaRacha());
         BottomNavigationHelper.setup(this, R.id.menuInicio);
-
-        cargarRachas();
     }
 
     @Override
@@ -163,11 +167,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarRachas() {
+        if (isLoadingRachas || isSeedingRachas) {
+            return;
+        }
+
+        isLoadingRachas = true;
         getRachasReference()
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
-                        crearRachasIniciales();
+                        resolverListaVacia();
                         return;
                     }
 
@@ -180,8 +189,40 @@ public class MainActivity extends AppCompatActivity {
 
                     ordenarRachas();
                     mostrarRachas();
+                    marcarRachasSeeded();
+                    isLoadingRachas = false;
                 })
                 .addOnFailureListener(e -> {
+                    isLoadingRachas = false;
+                    rachas.clear();
+                    mostrarRachas();
+                    Toast.makeText(this, R.string.racha_load_failed, Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * Seeds only once per user. If the list is empty after a previous seed
+     * (user deleted every racha), keep the empty list — do not recreate defaults.
+     */
+    private void resolverListaVacia() {
+        db.collection(COLLECTION_USERS)
+                .document(currentUserId)
+                .get()
+                .addOnSuccessListener(userDocument -> {
+                    boolean alreadySeeded = Boolean.TRUE.equals(
+                            userDocument.getBoolean(FIELD_RACHAS_SEEDED)
+                    );
+                    if (alreadySeeded) {
+                        rachas.clear();
+                        mostrarRachas();
+                        isLoadingRachas = false;
+                        return;
+                    }
+
+                    crearRachasIniciales();
+                })
+                .addOnFailureListener(e -> {
+                    isLoadingRachas = false;
                     rachas.clear();
                     mostrarRachas();
                     Toast.makeText(this, R.string.racha_load_failed, Toast.LENGTH_SHORT).show();
@@ -189,6 +230,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void crearRachasIniciales() {
+        if (isSeedingRachas) {
+            isLoadingRachas = false;
+            return;
+        }
+
+        isSeedingRachas = true;
         String today = getTodayDateKey();
         String yesterday = getYesterdayDateKey();
         Random random = new Random();
@@ -211,10 +258,35 @@ public class MainActivity extends AppCompatActivity {
             agregarHistorialCompletionsAlBatch(batch, rachaReference, racha);
         }
 
+        Map<String, Object> seedFlag = new HashMap<>();
+        seedFlag.put(FIELD_RACHAS_SEEDED, true);
+        seedFlag.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
+        batch.set(
+                db.collection(COLLECTION_USERS).document(currentUserId),
+                seedFlag,
+                SetOptions.merge()
+        );
+
         batch.commit()
-                .addOnSuccessListener(unused -> cargarRachas())
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, R.string.racha_seed_failed, Toast.LENGTH_SHORT).show());
+                .addOnSuccessListener(unused -> {
+                    isSeedingRachas = false;
+                    isLoadingRachas = false;
+                    cargarRachas();
+                })
+                .addOnFailureListener(e -> {
+                    isSeedingRachas = false;
+                    isLoadingRachas = false;
+                    Toast.makeText(this, R.string.racha_seed_failed, Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void marcarRachasSeeded() {
+        Map<String, Object> seedFlag = new HashMap<>();
+        seedFlag.put(FIELD_RACHAS_SEEDED, true);
+        seedFlag.put(FIELD_UPDATED_AT, FieldValue.serverTimestamp());
+        db.collection(COLLECTION_USERS)
+                .document(currentUserId)
+                .set(seedFlag, SetOptions.merge());
     }
 
     private int randomDays(Random random) {
@@ -258,8 +330,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if (dias < 0) {
-                    inputDias.setError(getString(R.string.dialog_new_racha_invalid_days));
+                if (dias < 0 || dias > MAX_RACHA_DIAS) {
+                    inputDias.setError(getString(R.string.dialog_new_racha_days_too_large, MAX_RACHA_DIAS));
                     return;
                 }
 
@@ -373,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
                     racha.lastCompletedDate = today;
                     ordenarRachas();
                     mostrarRachas();
+                    Toast.makeText(this, R.string.racha_completed_today_success, Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     imgFire.setEnabled(true);
