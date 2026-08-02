@@ -128,13 +128,16 @@
     <string name="profile_best_streak">%1$s — %2$d días</string>
 
     <string name="dialog_new_racha_title">Nueva racha</string>
-    <string name="dialog_new_racha_description">Completá los datos para agregar una nueva racha a tu lista.</string>
-    <string name="dialog_new_racha_name_hint">Nombre de la racha</string>
+    <string name="dialog_new_racha_description">Buscá y elegí una racha del catálogo o escribí una nueva.</string>
+    <string name="dialog_new_racha_name_hint">Buscar racha por nombre</string>
     <string name="dialog_new_racha_icon_hint">Icono o emoji</string>
     <string name="dialog_new_racha_add">Agregar</string>
     <string name="dialog_new_racha_cancel">Cancelar</string>
     <string name="dialog_new_racha_name_required">Ingresá el nombre de la racha.</string>
+    <string name="dialog_new_racha_duplicate">Ya tenés una racha con este nombre.</string>
     <string name="dialog_new_racha_added">Racha agregada.</string>
+    <string name="racha_catalog_load_failed">No se pudo cargar el catálogo de rachas.</string>
+    <string name="racha_catalog_add_failed">La racha se agregó, pero no se pudo guardar en el catálogo.</string>
     <string name="racha_already_completed_today">Esta racha ya fue completada hoy.</string>
     <string name="racha_completed_today_success">¡Racha completada hoy!</string>
     <string name="racha_load_failed">No se pudieron cargar las rachas.</string>

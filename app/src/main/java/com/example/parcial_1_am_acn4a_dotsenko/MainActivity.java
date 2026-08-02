@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String COLLECTION_USERS = "users";
     private static final String COLLECTION_RACHAS = "rachas";
+    private static final String COLLECTION_RACHA_CATALOG = "rachaCatalog";
     private static final String COLLECTION_COMPLETIONS = "completions";
     private static final String FIELD_ICONO = "icono";
     private static final String FIELD_NOMBRE = "nombre";
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String FIELD_DATE = "date";
     private static final String FIELD_COMPLETED_AT = "completedAt";
+    private static final String FIELD_ACTIVE = "active";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
 
     private LinearLayout rachaContainer;
@@ -178,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
                     ordenarRachas();
                     mostrarRachas();
+                    sincronizarRachasExistentesConCatalogo();
                     isLoadingRachas = false;
                 })
                 .addOnFailureListener(e -> {
@@ -191,8 +196,34 @@ public class MainActivity extends AppCompatActivity {
     private void mostrarDialogNuevaRacha() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_racha, null);
 
-        EditText inputNombre = dialogView.findViewById(R.id.inputRachaNombre);
+        AutoCompleteTextView inputNombre = dialogView.findViewById(R.id.inputRachaNombre);
         EditText inputIcono = dialogView.findViewById(R.id.inputRachaIcono);
+        ArrayAdapter<RachaTemplate> catalogAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                new ArrayList<>()
+        );
+
+        inputNombre.setAdapter(catalogAdapter);
+        inputNombre.setThreshold(0);
+        inputNombre.setOnClickListener(v -> inputNombre.showDropDown());
+        inputNombre.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                inputNombre.showDropDown();
+            }
+        });
+        inputNombre.setOnItemClickListener((parent, view, position, id) -> {
+            RachaTemplate template = catalogAdapter.getItem(position);
+            if (template == null) {
+                return;
+            }
+
+            inputNombre.setText(template.nombre, false);
+            inputIcono.setText(template.icono);
+            inputNombre.setSelection(inputNombre.length());
+        });
+
+        cargarCatalogoRachas(catalogAdapter);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_new_racha_title)
@@ -212,6 +243,11 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (yaExisteRacha(nombre)) {
+                    inputNombre.setError(getString(R.string.dialog_new_racha_duplicate));
+                    return;
+                }
+
                 if (TextUtils.isEmpty(icono)) {
                     icono = getString(R.string.default_racha_icon);
                 }
@@ -222,6 +258,118 @@ public class MainActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private void cargarCatalogoRachas(ArrayAdapter<RachaTemplate> catalogAdapter) {
+        db.collection(COLLECTION_RACHA_CATALOG)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    ArrayList<RachaTemplate> templates = new ArrayList<>();
+
+                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                        Boolean active = document.getBoolean(FIELD_ACTIVE);
+                        if (Boolean.FALSE.equals(active)) {
+                            continue;
+                        }
+
+                        String nombre = document.getString(FIELD_NOMBRE);
+                        String icono = document.getString(FIELD_ICONO);
+                        if (!TextUtils.isEmpty(nombre) && !TextUtils.isEmpty(icono)) {
+                            templates.add(new RachaTemplate(nombre.trim(), icono.trim()));
+                        }
+                    }
+
+                    mostrarCatalogoEnDropdown(catalogAdapter, templates);
+                })
+                .addOnFailureListener(e -> {
+                    catalogAdapter.clear();
+                    catalogAdapter.notifyDataSetChanged();
+                    Toast.makeText(
+                            this,
+                            R.string.racha_catalog_load_failed,
+                            Toast.LENGTH_SHORT
+                    ).show();
+                });
+    }
+
+    private void mostrarCatalogoEnDropdown(
+            ArrayAdapter<RachaTemplate> catalogAdapter,
+            ArrayList<RachaTemplate> templates
+    ) {
+        Collections.sort(templates, (first, second) ->
+                first.nombre.compareToIgnoreCase(second.nombre));
+        catalogAdapter.clear();
+        catalogAdapter.addAll(templates);
+        catalogAdapter.notifyDataSetChanged();
+    }
+
+    private String toCatalogDocumentId(String nombre) {
+        String nombreKey = normalizeNombreKey(nombre);
+        String documentId = nombreKey
+                .replaceAll("[^\\p{L}\\p{N}]+", "-")
+                .replaceAll("(^-|-$)", "");
+
+        return TextUtils.isEmpty(documentId)
+                ? "racha-" + Integer.toHexString(nombreKey.hashCode())
+                : documentId;
+    }
+
+    private Map<String, Object> buildCatalogMap(String nombre, String icono) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(FIELD_NOMBRE, nombre);
+        data.put(FIELD_NOMBRE_KEY, normalizeNombreKey(nombre));
+        data.put(FIELD_ICONO, icono);
+        data.put(FIELD_ACTIVE, true);
+        data.put(FIELD_CREATED_AT, FieldValue.serverTimestamp());
+        return data;
+    }
+
+    private void guardarRachaEnCatalogo(String nombre, String icono) {
+        guardarRachaEnCatalogo(nombre, icono, true);
+    }
+
+    private void guardarRachaEnCatalogo(
+            String nombre,
+            String icono,
+            boolean mostrarError
+    ) {
+        DocumentReference catalogReference = db.collection(COLLECTION_RACHA_CATALOG)
+                .document(toCatalogDocumentId(nombre));
+
+        db.runTransaction(transaction -> {
+                    DocumentSnapshot catalogDocument = transaction.get(catalogReference);
+                    if (!catalogDocument.exists()) {
+                        transaction.set(catalogReference, buildCatalogMap(nombre, icono));
+                    }
+                    return null;
+                })
+                .addOnFailureListener(e -> {
+                    if (mostrarError) {
+                        Toast.makeText(
+                                this,
+                                R.string.racha_catalog_add_failed,
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+    }
+
+    private void sincronizarRachasExistentesConCatalogo() {
+        for (Racha racha : rachas) {
+            if (!TextUtils.isEmpty(racha.nombre) && !TextUtils.isEmpty(racha.icono)) {
+                guardarRachaEnCatalogo(racha.nombre, racha.icono, false);
+            }
+        }
+    }
+
+    private boolean yaExisteRacha(String nombre) {
+        String nombreKey = normalizeNombreKey(nombre);
+        for (Racha racha : rachas) {
+            if (nombreKey.equals(racha.nombreKey)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void guardarNuevaRacha(
@@ -236,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
         rachaReference.set(racha.toMap(currentUserId, true))
                 .addOnSuccessListener(unused -> {
                     rachas.add(racha);
+                    guardarRachaEnCatalogo(nombre, icono);
                     ordenarRachas();
                     mostrarRachas();
                     Toast.makeText(this, R.string.dialog_new_racha_added, Toast.LENGTH_SHORT).show();
@@ -462,6 +611,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             return data;
+        }
+    }
+
+    private static class RachaTemplate {
+        final String nombre;
+        final String icono;
+
+        RachaTemplate(String nombre, String icono) {
+            this.nombre = nombre;
+            this.icono = icono;
+        }
+
+        @Override
+        public String toString() {
+            return icono + "  " + nombre;
         }
     }
 }
