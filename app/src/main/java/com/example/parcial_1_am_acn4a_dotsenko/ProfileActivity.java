@@ -26,8 +26,15 @@ import com.google.firebase.firestore.SetOptions;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -41,6 +48,8 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String FIELD_PHOTO_URL = "photoUrl";
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String AVATAR_API_URL = "https://ui-avatars.com/api/";
+    private static final String ZEN_QUOTES_BASE_URL = "https://zenquotes.io/";
+    private static final String ZEN_QUOTES_WEB_URL = "https://zenquotes.io/";
 
     private ImageView imgProfile;
     private TextView txtUserEmail;
@@ -49,6 +58,8 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView txtActiveRachas;
     private TextView txtCompletedToday;
     private TextView txtBestRacha;
+    private TextView txtDailyQuote;
+    private TextView txtDailyQuoteAuthor;
     private Button btnEditProfile;
 
     private FirebaseAuth auth;
@@ -57,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String currentFullName = "";
     private String currentPhoneNumber = "";
     private String currentEmail = "";
+    private Call<List<QuoteResponse>> quoteCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +95,8 @@ public class ProfileActivity extends AppCompatActivity {
         txtActiveRachas = findViewById(R.id.txtActiveRachas);
         txtCompletedToday = findViewById(R.id.txtCompletedToday);
         txtBestRacha = findViewById(R.id.txtBestRacha);
+        txtDailyQuote = findViewById(R.id.txtProfileDailyQuote);
+        txtDailyQuoteAuthor = findViewById(R.id.txtProfileDailyQuoteAuthor);
         btnEditProfile = findViewById(R.id.btnEditProfile);
         Button btnLogout = findViewById(R.id.btnLogout);
 
@@ -91,6 +105,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         cargarPerfilUsuario();
         cargarEstadisticas();
+        cargarInspiracionDelDia();
+
+        TextView txtQuoteSource = findViewById(R.id.txtProfileQuoteSource);
+        txtQuoteSource.setOnClickListener(v -> startActivity(
+                new Intent(Intent.ACTION_VIEW, Uri.parse(ZEN_QUOTES_WEB_URL))
+        ));
 
         btnEditProfile.setOnClickListener(v -> mostrarDialogEditarPerfil());
         btnLogout.setOnClickListener(v -> {
@@ -102,6 +122,69 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         BottomNavigationHelper.setup(this, R.id.menuPerfil);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (quoteCall != null) {
+            quoteCall.cancel();
+        }
+        super.onDestroy();
+    }
+
+    private void cargarInspiracionDelDia() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ZEN_QUOTES_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ZenQuotesApi api = retrofit.create(ZenQuotesApi.class);
+        quoteCall = api.getTodayQuote();
+        quoteCall.enqueue(new Callback<List<QuoteResponse>>() {
+            @Override
+            public void onResponse(
+                    Call<List<QuoteResponse>> call,
+                    Response<List<QuoteResponse>> response
+            ) {
+                if (!response.isSuccessful()
+                        || response.body() == null
+                        || response.body().isEmpty()) {
+                    mostrarInspiracionFallback(true);
+                    return;
+                }
+
+                QuoteResponse quote = response.body().get(0);
+                if (TextUtils.isEmpty(quote.getText())) {
+                    mostrarInspiracionFallback(true);
+                    return;
+                }
+
+                txtDailyQuote.setText(quote.getText());
+                String author = !TextUtils.isEmpty(quote.getAuthor())
+                        ? quote.getAuthor()
+                        : getString(R.string.profile_quote_fallback_author);
+                txtDailyQuoteAuthor.setText(getString(R.string.profile_quote_author_format, author));
+            }
+
+            @Override
+            public void onFailure(Call<List<QuoteResponse>> call, Throwable throwable) {
+                if (!call.isCanceled()) {
+                    mostrarInspiracionFallback(true);
+                }
+            }
+        });
+    }
+
+    private void mostrarInspiracionFallback(boolean notifyUser) {
+        txtDailyQuote.setText(R.string.profile_quote_fallback);
+        txtDailyQuoteAuthor.setText(getString(
+                R.string.profile_quote_author_format,
+                getString(R.string.profile_quote_fallback_author)
+        ));
+
+        if (notifyUser) {
+            Toast.makeText(this, R.string.profile_quote_load_error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void cargarEstadisticas() {

@@ -17,6 +17,7 @@ Cada usuario puede crear una cuenta, iniciar sesión, ver sus rachas, marcar las
 - Amigos: agregar desde rachas en común, buscar, eliminar.
 - Estadísticas en perfil y calendario.
 - Avatares desde URL con Glide.
+- Inspiración diaria en Perfil desde ZenQuotes mediante Retrofit, con fallback local.
 - Toasts en operaciones clave.
 - Navegación inferior: Inicio, Calendario, Amigos, Perfil.
 - Pasaje de datos entre Activities con Intent extras.
@@ -52,5 +53,6 @@ Informe visual (Canva): https://canva.link/bc5yckwbhbnnr9a
 
 - Java, Activities, layouts XML (ConstraintLayout / LinearLayout)
 - Firebase Auth + Cloud Firestore
+- Retrofit + Gson (contenido JSON desde ZenQuotes)
 - Glide
 - Recursos organizados en `strings.xml`, `colors.xml`, `dimens.xml`

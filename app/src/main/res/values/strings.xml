@@ -114,6 +114,13 @@
     <string name="profile_completed_today_label">Completadas hoy</string>
     <string name="profile_best_streak_label">Mejor racha</string>
     <string name="profile_best_streak_value">%1$s — %2$d días</string>
+    <string name="profile_inspiration_title">Inspiración del día</string>
+    <string name="profile_quote_loading">Cargando inspiración...</string>
+    <string name="profile_quote_fallback">Cada día cuenta. Seguí construyendo tu racha.</string>
+    <string name="profile_quote_fallback_author">Racha App</string>
+    <string name="profile_quote_author_format">— %1$s</string>
+    <string name="profile_quote_source">Fuente: ZenQuotes.io</string>
+    <string name="profile_quote_load_error">No se pudo cargar la inspiración del día.</string>
 
     <!-- Estadísticas de Perfil -->
     <string name="profile_active_rachas">%1$d rachas activas</string>

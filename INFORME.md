@@ -138,6 +138,7 @@ Para sumar amigos: Inicio → Detalle → Agregar.
 - Auth-guard.
 - Nombre, email, teléfono y avatar.
 - Estadísticas: rachas activas, completadas hoy, mejor racha.
+- Tarjeta inferior de inspiración diaria obtenida desde ZenQuotes mediante Retrofit, con autor, atribución y fallback local.
 - Editar perfil (nombre y teléfono → Firestore + Auth displayName).
 - Cerrar sesión.
 
@@ -166,6 +167,7 @@ users/{userId}
 - Varias pantallas y navegación.
 - ConstraintLayout / LinearLayout, Button, TextView.
 - Contenido real e imágenes (Glide / avatares por URL).
+- Contenido JSON desde URL mediante Retrofit (inspiración diaria de ZenQuotes en Perfil).
 - Eventos y comportamiento dinámico (listas, marcar día, filtros).
 - Pasaje de datos entre Activities (extras).
 - Firebase Auth (login + registro).
