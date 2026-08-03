@@ -152,7 +152,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String buildAvatarUrl(String fallbackText) {
-        String seed = !TextUtils.isEmpty(fallbackText) ? fallbackText : "Usuario";
+        String seed = !TextUtils.isEmpty(fallbackText)
+                ? fallbackText
+                : getString(R.string.profile_user_fallback);
 
         return Uri.parse(AVATAR_API_URL)
                 .buildUpon()
