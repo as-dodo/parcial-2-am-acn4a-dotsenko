@@ -3,7 +3,7 @@
 Documento de apoyo para la entrega del final (Aplicaciones móviles).  
 Describe cada pantalla, las funcionalidades esperadas y el flujo de uso.
 
-Herramienta de mock / presentación visual (opcional): Canva — https://canva.link/bc5yckwbhbnnr9a
+Herramienta de mock / presentación visual (opcional): Canva — https://canva.link/yn7nn9z2ad5z1bx
 
 ---
 
@@ -149,6 +149,53 @@ Abrir Perfil → editar datos o cerrar sesión.
 
 ## 4. Datos en Firebase (resumen)
 
+### Usuarios
+
+Los datos principales de cada cuenta se guardan en:
+
+`users/{userId}`
+
+Cada documento contiene información como `fullName`, `phoneNumber`, `email` y `photoUrl`.
+
+### Rachas
+
+Cada usuario tiene una subcolección independiente con sus propias rachas:
+
+`users/{userId}/rachas/{rachaId}`
+
+Cada documento de racha almacena `nombre`, `nombreKey`, `icono`, `dias`,
+`lastCompletedDate`, `userId`, `createdAt` y `updatedAt`. Esta separación permite que
+cada cuenta consulte y modifique solamente sus propios hábitos.
+
+### Historial de completions
+
+Dentro de cada racha se guarda el historial de los días completados:
+
+`users/{userId}/rachas/{rachaId}/completions/{yyyy-MM-dd}`
+
+Cada completion contiene `date`, `nombre`, `icono` y `completedAt`. Estos datos se
+utilizan para construir el calendario y las estadísticas mensuales.
+
+### Amigos
+
+Los amigos agregados por cada usuario se guardan en:
+
+`users/{userId}/friends/{friendUserId}`
+
+Cada documento contiene `fullName`, `email`, `photoUrl` y `selectedRachas`, donde se
+conserva la información de las rachas compartidas.
+
+### Catálogo de rachas
+
+Las sugerencias disponibles al crear una nueva racha se guardan en una colección
+compartida:
+
+`rachaCatalog/{nombreNormalizado}`
+
+Cada documento contiene `nombre`, `nombreKey`, `icono`, `active` y `createdAt`.
+
+### Estructura completa
+
 ```
 users/{userId}
   fullName, phoneNumber, email, photoUrl
@@ -158,6 +205,9 @@ users/{userId}
       date, nombre, icono, completedAt
   friends/{friendUserId}
     fullName, email, photoUrl, selectedRachas, ...
+
+rachaCatalog/{nombreNormalizado}
+  nombre, nombreKey, icono, active, createdAt
 ```
 
 ---
