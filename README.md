@@ -47,7 +47,7 @@ Cada usuario puede crear una cuenta, iniciar sesión, ver sus rachas, marcar las
 
 Descripción por pantalla (funciones esperadas + flujo): ver [`INFORME.md`](INFORME.md).
 
-Informe visual (Canva): https://canva.link/bc5yckwbhbnnr9a
+Informe visual (Canva): https://canva.link/yn7nn9z2ad5z1bx
 
 ## Stack
 
